@@ -38,8 +38,9 @@
   th{color:#9fb7ff; text-align:left; font-weight:600}
   .foot{margin-top:18px; display:flex; gap:10px; align-items:center; opacity:.9}
   .logo{width:28px; height:28px}
-  .chartWrap{margin-top:14px; height:240px}
+  .chartWrap{margin-top:14px; height:260px}
   .pill{padding:6px 10px; border:1px solid #38e8ff44; border-radius:999px}
+  .hint{opacity:.8; font-size:12px}
 </style>
 </head>
 <body>
@@ -55,6 +56,7 @@
         <button class="btn" id="shareBtn">Share</button>
         <button class="btn" id="pngBtn">Export PNG</button>
         <button class="btn" id="pdfBtn">Export PDF</button>
+        <button class="btn" id="csvBtn">Export CSV</button>
       </div>
     </div>
 
@@ -63,11 +65,11 @@
         <div class="ctitle"><h3 data-i="params">Parameters</h3><span class="pill">ZEUS AI</span></div>
         <div class="fields">
           <div class="row split">
-            <label>
+            <label title="Starting principal">
               <div data-i="initial">Initial amount</div>
               <input type="number" id="initial" value="400000" min="0" />
             </label>
-            <label>
+            <label title="Display currency symbol">
               <div data-i="currency">Currency</div>
               <select id="currency">
                 <option value="₽">₽</option>
@@ -81,11 +83,11 @@
           </div>
 
           <div class="row two">
-            <label>
+            <label title="Recurring deposit size">
               <div data-i="contrib">Periodic contribution</div>
               <input type="number" id="contrib" value="10000" min="0" />
             </label>
-            <label>
+            <label title="How often you deposit">
               <div data-i="contribFreq">Contribution frequency</div>
               <select id="contribFreq">
                 <option value="0" data-i="none">None</option>
@@ -97,11 +99,11 @@
           </div>
 
           <div class="row two">
-            <label>
+            <label title="Nominal annual interest rate">
               <div data-i="rate">Annual interest rate (%)</div>
               <input type="number" id="rate" value="5" step="0.01" />
             </label>
-            <label>
+            <label title="How often interest compounds">
               <div data-i="compound">Compounding frequency</div>
               <select id="compound">
                 <option value="12" selected>Monthly (12)</option>
@@ -111,13 +113,32 @@
             </label>
           </div>
 
-          <div class="row split" style="align-items:end">
+          <div class="row two">
+            <label title="Annual platform/broker fee">
+              <div data-i="fee">Annual fee (%)</div>
+              <input type="number" id="fee" value="0" step="0.01" />
+            </label>
+            <label title="Annual inflation">
+              <div data-i="infl">Inflation (%)</div>
+              <input type="number" id="infl" value="0" step="0.01" />
+            </label>
+          </div>
+
+          <div class="row two">
+            <label title="When deposit is made in each period">
+              <div data-i="timing">Contribution timing</div>
+              <select id="timing">
+                <option value="end" selected data-i="timing_end">End of period</option>
+                <option value="begin" data-i="timing_begin">Beginning of period</option>
+              </select>
+            </label>
             <label>
               <div data-i="years">Years</div>
               <input type="number" id="years" value="4" min="1" />
             </label>
-            <div class="muted" data-i="note">Contributions occur at the end of each contribution period. Interest compounds per selected frequency.</div>
           </div>
+
+          <div class="hint" data-i="note">Contributions occur at the end of each contribution period. Interest compounds per selected frequency.</div>
         </div>
       </div>
 
@@ -128,10 +149,16 @@
           <div class="stat"><small data-i="totalC">Total contributions</small><b class="accent-o" id="tcontrib"></b></div>
           <div class="stat"><small data-i="interest">Total interest</small><b class="accent-l" id="tinterest"></b></div>
         </div>
+
+        <div class="pill" style="margin:10px 0" id="earLine">
+          <span data-i="ear">Effective annual rate</span>: <b id="earVal"></b>
+        </div>
+
         <div class="chartWrap"><canvas id="chart" aria-label="Growth chart"></canvas></div>
+
         <div style="margin-top:8px">
           <table>
-            <thead><tr><th data-i="year">Year</th><th data-i="balance">Balance</th></tr></thead>
+            <thead><tr><th data-i="year">Year</th><th data-i="balance">Balance</th><th data-i="real">Real (after inflation)</th></tr></thead>
             <tbody id="tbody"></tbody>
           </table>
         </div>
@@ -152,8 +179,8 @@
     const i = (id)=>document.getElementById(id);
 
     const dict = {
-      en:{ title:"Compound Interest Calculator", params:"Parameters", initial:"Initial amount", currency:"Currency", contrib:"Periodic contribution", contribFreq:"Contribution frequency", none:"None", rate:"Annual interest rate (%)", compound:"Compounding frequency", years:"Years", note:"Contributions occur at the end of each contribution period. Interest compounds per selected frequency.", results:"Results", final:"Final balance", totalC:"Total contributions", interest:"Total interest", year:"Year", balance:"Balance", tip:"Tip: set Contributions to 0 to see pure compounding. Values are estimates for education only.", },
-      ru:{ title:"Калькулятор сложных процентов", params:"Параметры", initial:"Стартовая сумма", currency:"Валюта", contrib:"Регулярное пополнение", contribFreq:"Частота пополнений", none:"Нет", rate:"Годовая ставка (%)", compound:"Частота капитализации", years:"Годы", note:"Пополнение происходит в конце периода. Проценты начисляются по выбранной частоте.", results:"Результаты", final:"Итоговая сумма", totalC:"Всего пополнений", interest:"Начисленные проценты", year:"Год", balance:"Баланс", tip:"Подсказка: установите пополнения 0 — увидите чистую капитализацию. Значения ориентировочные.", }
+      en:{ title:"Compound Interest Calculator", params:"Parameters", initial:"Initial amount", currency:"Currency", contrib:"Periodic contribution", contribFreq:"Contribution frequency", none:"None", rate:"Annual interest rate (%)", compound:"Compounding frequency", years:"Years", note:"Contributions occur at the end of each contribution period. Interest compounds per selected frequency.", results:"Results", final:"Final balance", totalC:"Total contributions", interest:"Total interest", year:"Year", balance:"Balance", tip:"Tip: set Contributions to 0 to see pure compounding. Values are estimates for education only.", fee:"Annual fee (%)", infl:"Inflation (%)", timing:"Contribution timing", timing_end:"End of period", timing_begin:"Beginning of period", ear:"Effective annual rate", real:"Real (after inflation)" },
+      ru:{ title:"Калькулятор сложных процентов", params:"Параметры", initial:"Стартовая сумма", currency:"Валюта", contrib:"Регулярное пополнение", contribFreq:"Частота пополнений", none:"Нет", rate:"Годовая ставка (%)", compound:"Частота капитализации", years:"Годы", note:"Пополнение происходит в конце периода. Проценты начисляются по выбранной частоте.", results:"Результаты", final:"Итоговая сумма", totalC:"Всего пополнений", interest:"Начисленные проценты", year:"Год", balance:"Баланс", tip:"Подсказка: установите пополнения 0 — увидите чистую капитализацию. Значения ориентировочные.", fee:"Комиссия в год (%)", infl:"Инфляция (%)", timing:"Момент пополнения", timing_end:"В конце периода", timing_begin:"В начале периода", ear:"Эффективная годовая ставка", real:"Реально (с учётом инфляции)" }
     };
 
     let lang='ru';
@@ -164,23 +191,47 @@
     function fmtCurrency(sym, n){ return `${sym} ${n.toLocaleString(undefined,{maximumFractionDigits:2})}`; }
 
     function compute(params){
-      const {initial, contrib, contribFreq, rate, compound, years}=params;
-      const n=Math.max(1, Math.floor(compound));
-      const m=Math.max(1, Math.floor(contribFreq));
-      const stepsPerYear = (m===0? n : lcm(n,m));
+      const {initial, contrib, contribFreq, rate, fee, infl, compound, years, timing} = params;
+      const n = Math.max(1, Math.floor(compound));      // начислений в год
+      const m = Math.max(0, Math.floor(contribFreq));   // пополнений в год (0=нет)
+      const stepsPerYear = (m === 0 ? n : lcm(n, m));
       const compoundEvery = stepsPerYear / n;
-      const contribEvery = m===0 ? Infinity : stepsPerYear / m;
+      const contribEvery = (m === 0 ? Infinity : stepsPerYear / m);
 
-      let balance = +initial || 0; let totalC=0;
-      const yearly=[];
-      for(let y=1;y<=years;y++){
-        for(let s=1;s<=stepsPerYear;s++){
-          if(s%compoundEvery===0){ balance *= 1 + (rate/100)/n; }
-          if(s%contribEvery===0 && contrib>0){ balance += +contrib; totalC += +contrib; }
+      const rNet = (rate - fee) / 100; // простая модель комиссии
+
+      let balance = +initial || 0;
+      let totalC = 0;
+      let invested = +initial || 0;
+
+      const yearly = [];
+      const investedYearly = [];
+
+      for (let y = 1; y <= years; y++) {
+        for (let s = 1; s <= stepsPerYear; s++) {
+          if (timing === 'begin' && ((s-1) % contribEvery === 0) && contrib > 0) {
+            balance += +contrib; totalC += +contrib; invested += +contrib;
+          }
+          if (s % compoundEvery === 0) {
+            balance *= 1 + (rNet / n);
+          }
+          if (timing === 'end' && (s % contribEvery === 0) && contrib > 0) {
+            balance += +contrib; totalC += +contrib; invested += +contrib;
+          }
         }
-        yearly.push({year:y, balance});
+        const real = infl ? balance / Math.pow(1 + infl/100, y) : balance;
+        yearly.push({ year: y, balance, real });
+        investedYearly.push(invested);
       }
-      return { final: balance, totalC, interest: balance - (+initial + totalC), yearly };
+
+      return {
+        final: balance,
+        totalC,
+        interest: balance - (+initial + totalC),
+        yearly,
+        investedYearly,
+        ear: Math.pow(1 + (rNet / n), n) - 1,
+      };
     }
 
     let chart;
@@ -190,29 +241,37 @@
         contrib:+i('contrib').value,
         contribFreq:+i('contribFreq').value,
         rate:+i('rate').value,
+        fee:+i('fee').value,
+        infl:+i('infl').value,
         compound:+i('compound').value,
         years:+i('years').value,
-        currency:i('currency').value
+        currency:i('currency').value,
+        timing:i('timing').value
       };
       const r=compute(params);
       i('final').textContent=fmtCurrency(params.currency,r.final);
       i('tcontrib').textContent=fmtCurrency(params.currency,r.totalC);
       i('tinterest').textContent=fmtCurrency(params.currency,r.interest);
+      i('earVal').textContent=((r.ear*100).toFixed(2))+'%';
 
       const tb=i('tbody'); tb.innerHTML='';
-      r.yearly.forEach(y=>{
+      r.yearly.forEach((y, idx)=>{
         const tr=document.createElement('tr');
-        tr.innerHTML=`<td>${y.year}</td><td>${fmtCurrency(params.currency,y.balance)}</td>`;
+        tr.innerHTML=`<td>${y.year}</td><td>${fmtCurrency(params.currency,y.balance)}</td><td>${fmtCurrency(params.currency,y.real)}</td>`;
         tb.appendChild(tr);
       });
 
       const labels=r.yearly.map(y=>y.year);
-      const data=r.yearly.map(y=>y.balance);
+      const invested=r.investedYearly;
+      const total=r.yearly.map(y=>y.balance);
       if(chart) chart.destroy();
       chart=new Chart(i('chart').getContext('2d'),{
         type:'line',
-        data:{labels, datasets:[{label:'Balance', data, borderColor:'#38e8ff', backgroundColor:'rgba(56,232,255,.15)', tension:.25}]},
-        options:{plugins:{legend:{display:false}}, scales:{x:{ticks:{color:'#9fb7ff'}}, y:{ticks:{color:'#9fb7ff'}}}}
+        data:{labels, datasets:[
+          {label:(lang==='ru'?'Внесено':'Invested'), data:invested, borderColor:'#ff8a2a', backgroundColor:'rgba(255,138,42,.18)', tension:.25, fill:true},
+          {label:(lang==='ru'?'Итог':'Total'), data:total, borderColor:'#38e8ff', backgroundColor:'rgba(56,232,255,.15)', tension:.25, fill:'-1'}
+        ]},
+        options:{plugins:{legend:{display:true, labels:{color:'#d7eaff'}}}, scales:{x:{ticks:{color:'#9fb7ff'}}, y:{ticks:{color:'#9fb7ff'}}}}
       });
 
       const q=new URLSearchParams(params).toString();
@@ -221,15 +280,15 @@
 
     (function initFromQuery(){
       const qs=new URLSearchParams(location.search);
-      const map={initial:'initial',contrib:'contrib',contribFreq:'contribFreq',rate:'rate',compound:'compound',years:'years',currency:'currency'};
+      const map={initial:'initial',contrib:'contrib',contribFreq:'contribFreq',rate:'rate',compound:'compound',years:'years',currency:'currency',fee:'fee',infl:'infl',timing:'timing'};
       Object.entries(map).forEach(([k,id])=>{ if(qs.get(k)!=null) i(id).value=qs.get(k); });
       lang = (qs.get('lang')==='en')? 'en' : 'ru';
       applyLang();
     })();
 
-    ['initial','contrib','contribFreq','rate','compound','years','currency'].forEach(id=> i(id).addEventListener('input', render));
+    ['initial','contrib','contribFreq','rate','fee','infl','compound','years','currency','timing'].forEach(id=> i(id).addEventListener('input', render));
 
-    i('toggleLang').addEventListener('click',()=>{ lang = (lang==='en'?'ru':'en'); applyLang(); });
+    i('toggleLang').addEventListener('click',()=>{ lang = (lang==='en'?'ru':'en'); applyLang(); render(); });
 
     i('shareBtn').addEventListener('click',async()=>{
       const url=location.href;
@@ -247,8 +306,36 @@
       const h=canvas.height * (w/canvas.width);
       pdf.addImage(imgData,'PNG',0,0,w,h); pdf.save('zeus-ai-calculator.pdf');
     }
+    function exportCSV(data){
+      let csv = 'Year,Invested,Total,Growth,Real\n';
+      data.yearly.forEach((y, idx) => {
+        const inv = data.investedYearly[idx];
+        const growth = y.balance - inv;
+        csv += `${y.year},${inv},${y.balance},${growth},${y.real}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'zeus-ai-projection.csv';
+      a.click();
+    }
     i('pngBtn').addEventListener('click', exportPNG);
     i('pdfBtn').addEventListener('click', exportPDF);
+    i('csvBtn').addEventListener('click', ()=>{
+      const params={
+        initial:+i('initial').value,
+        contrib:+i('contrib').value,
+        contribFreq:+i('contribFreq').value,
+        rate:+i('rate').value,
+        fee:+i('fee').value,
+        infl:+i('infl').value,
+        compound:+i('compound').value,
+        years:+i('years').value,
+        currency:i('currency').value,
+        timing:i('timing').value
+      };
+      exportCSV(compute(params));
+    });
 
     render();
   </script>
