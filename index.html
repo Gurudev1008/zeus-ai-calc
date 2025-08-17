@@ -1,72 +1,19 @@
 <!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ZEUS AI — Калькулятор сложных процентов</title>
 <link rel="icon" href="assets/favicon.svg">
 <style>
-:root{--bg:#0b1330;--bg2:#111b45;--panel:#0f1d3f;--text:#d7eaff;--cyan:#38e8ff;--orange:#ff8a2a;--pink:#ff5bbd;--lime:#9cff70}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto;color:var(--text);
-background: radial-gradient(1200px 600px at 10% 0%, #13214a 0%, var(--bg) 55%, #081027 100%)}
-.container{max-width:1080px;margin:0 auto;padding:32px 20px}
-.nav{display:flex;align-items:center;gap:12px}
-.logo{width:28px;height:28px}.brand{font-size:13px;letter-spacing:1.6px;color:#9bdfff}
-h1{margin:12px 0 0;font-size:36px;color:var(--cyan);letter-spacing:.4px}
-.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;margin-top:26px;align-items:center}
-.card{background:linear-gradient(180deg,var(--panel),#0b1836);border:1px solid #38e8ff33;border-radius:18px;padding:22px;
-box-shadow:0 0 0 1px rgba(56,232,255,.06) inset,0 20px 40px -20px rgba(0,0,0,.6)}
-.lead{font-size:18px;opacity:.9}
-.cta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
-.btn{background:linear-gradient(90deg,#1b2f73,#103a5f);color:var(--text);border:1px solid #38e8ff55;padding:12px 16px;border-radius:12px;text-decoration:none;font-weight:700}
-.btn:hover{box-shadow:0 0 14px #38e8ff66}
-.pill{padding:6px 10px;border:1px solid #38e8ff44;border-radius:999px}
-ul{margin:12px 0 0 18px}
-.preview{display:flex;justify-content:center;align-items:center}
-.preview .circle{width:320px;height:320px;border:2px solid #38e8ff55;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px #38e8ff33 inset}
-.preview img{width:60%;height:auto;filter:drop-shadow(0 0 18px #38e8ff88)}
-.footer{margin:28px 0 0;opacity:.85;font-size:12px;display:flex;align-items:center;gap:10px}
-@media (max-width:860px){.hero{grid-template-columns:1fr}.preview{order:-1;margin-bottom:12px}}
-</style>
-</head>
-<body>
-  <div class="container">
-    <div class="nav">
-      <img class="logo" src="assets/logo.svg" alt="ZEUS AI logo"/>
-      <div class="brand">ZEUS AI</div>
-    </div>
-    <h1>Калькулятор сложных процентов</h1>
-    <div class="hero">
-      <div class="card">
-        <p class="lead">Неоновый калькулятор ZEUS AI для расчёта сложного процента и пополнений (DCA). RU/EN, экспорт PNG/PDF/CSV, шаринг параметров.</p>
-        <ul>
-          <li>Разные частоты пополнений и капитализации</li>
-          <li>График роста <b>(внесено vs рост)</b> и таблица по годам</li>
-          <li>Экспорт PNG / PDF / CSV</li>
-        </ul>
-        <div class="cta">
-          <a class="btn" href="calc/index.html">Открыть калькулятор</a>
-          <a class="btn" href="#connect">Подключиться к копитрейдингу ZEUS AI</a>
-          <span class="pill">NEON MODE</span>
-        </div>
-      </div>
-      <div class="preview">
-        <div class="circle"><img src="assets/logo-512.png" alt="ZEUS AI emblem"/></div>
-      </div>
-    </div>
-    <div id="connect" class="card" style="margin-top:20px">
-      <h3 style="color:var(--cyan);margin:0 0 10px">Подключиться к копитрейдингу</h3>
-      <p style="margin:0 0 8px">Оставьте контакт, и мы пришлём инструкцию подключения:</p>
-      <form onsubmit="alert('Спасибо! Мы свяжемся с вами.'); return false;" style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px">
-        <input placeholder="Имя" required/>
-        <input placeholder="Telegram или Email" required/>
-        <button class="btn" type="submit">Отправить</button>
-      </form>
-    </div>
-    <div class="footer">
-      <img class="logo" src="assets/favicon.svg" alt="logo"/>
-      <div>© ZEUS AI — Neon Tools Suite</div>
-    </div>
+:root{--bg:#0b1330;--panel:#0f1d3f;--text:#d7eaff;--cyan:#38e8ff;--orange:#ff8a2a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(1200px 600px at 10% 0%,#13214a 0%,#0b1330 55%,#081027 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 18px}
+.nav{display:flex;gap:10px;align-items:center}.nav img{width:28px;height:28px}.brand{letter-spacing:1.6px;color:#9bdfff;font-size:13px}
+h1{color:var(--cyan);margin:8px 0 0}.card{margin-top:18px;background:linear-gradient(180deg,var(--panel),#0b1836);border:1px solid #38e8ff33;border-radius:16px;padding:18px}
+.btn{display:inline-block;background:linear-gradient(90deg,#1b2f73,#103a5f);border:1px solid #38e8ff55;color:#fff;text-decoration:none;padding:12px 16px;border-radius:12px;margin-right:10px}
+</style></head>
+<body><div class="wrap">
+  <div class="nav"><img src="assets/logo.svg"/><div class="brand">ZEUS AI</div></div>
+  <h1>Калькулятор сложных процентов</h1>
+  <div class="card"><p>Новая версия: подсказки к каждому полю, пошаговая инструкция, цели (goal seek) и сценарии <b>пессимистичный/база/оптимистичный</b>.</p>
+  <a class="btn" href="calc/index.html">Открыть калькулятор</a>
   </div>
-</body>
-</html>
+</div></body></html>

@@ -1,343 +1,362 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ZEUS AI • Compound Interest Calculator</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>ZEUS AI • Калькулятор сложных процентов</title>
 <link rel="icon" href="../assets/favicon.svg"/>
 <style>
-  :root{--bg:#0b1330; --bg2:#111b45; --panel:#0f1d3f; --text:#d7eaff; --cyan:#38e8ff; --orange:#ff8a2a; --pink:#ff5bbd; --lime:#9cff70;}
-  *{box-sizing:border-box}
-  body{margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto; color:var(--text);
-    background: radial-gradient(1200px 600px at 10% 0%, #13214a 0%, #0b1330 55%, #081027 100%);}
-  .wrap{max-width:1120px; margin:24px auto; padding:0 16px}
-  .head{display:flex; gap:12px; align-items:center; margin-bottom:18px}
-  .brand{font-size:13px; letter-spacing:1.6px; color:#9bdfff}
-  h1{margin:0; font-size:24px; color:var(--cyan)}
-  .grid{display:grid; grid-template-columns:minmax(320px,520px) minmax(320px,1fr); gap:20px}
-  .card{background:linear-gradient(180deg, var(--panel), #0b1836); border:1px solid #38e8ff33; border-radius:18px; padding:18px; box-shadow:0 0 0 1px rgba(56,232,255,.06) inset, 0 20px 40px -20px rgba(0,0,0,.6)}
-  .ctitle{display:flex; justify-content:space-between; align-items:center; margin:0 0 12px}
-  .ctitle h3{margin:0; color:var(--cyan)}
-  .fields{display:grid; gap:14px}
-  .row{display:grid; gap:10px}
-  .row.two{grid-template-columns:1fr 1fr}
-  .row.split{grid-template-columns:1fr auto}
-  label{font-size:13px; opacity:.9; letter-spacing:.4px}
-  input,select{background:rgba(255,255,255,.02); border:1px solid #38e8ff30; color:var(--text); padding:12px 14px; border-radius:12px; outline:none; font-size:16px}
-  .muted{opacity:.7; font-size:12px}
-  .stats{display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px}
-  .stat{display:grid; gap:6px}
-  .stat small{color:#9fb7ff}
-  .stat b{font-size:26px}
-  .accent-c{color:var(--cyan)} .accent-o{color:var(--orange)} .accent-l{color:var(--lime)}
-  .toolbar{display:flex; gap:10px; flex-wrap:wrap; margin-left:auto}
-  .btn{background:linear-gradient(90deg, #1b2f73, #103a5f); color:var(--text); border:1px solid #38e8ff55; padding:10px 14px; border-radius:12px; cursor:pointer}
-  .btn:hover{box-shadow:0 0 12px #38e8ff55}
-  table{width:100%; border-collapse:collapse; font-size:14px}
-  th,td{padding:10px 8px; border-bottom:1px dashed #38e8ff33}
-  th{color:#9fb7ff; text-align:left; font-weight:600}
-  .foot{margin-top:18px; display:flex; gap:10px; align-items:center; opacity:.9}
-  .logo{width:28px; height:28px}
-  .chartWrap{margin-top:14px; height:260px}
-  .pill{padding:6px 10px; border:1px solid #38e8ff44; border-radius:999px}
-  .hint{opacity:.8; font-size:12px}
+:root{--bg:#0b1330;--panel:#0f1d3f;--text:#d7eaff;--cyan:#38e8ff;--orange:#ff8a2a;--lime:#9cff70}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto;color:var(--text);background:radial-gradient(1200px 600px at 10% 0%,#13214a 0%,#0b1330 55%,#081027 100%)}
+.wrap{max-width:1120px;margin:24px auto;padding:0 16px}
+.head{display:flex;gap:12px;align-items:center;margin-bottom:18px}
+.logo{width:28px;height:28px}
+.brand{font-size:13px;letter-spacing:1.6px;color:#9bdfff}
+h1{margin:0;font-size:24px;color:var(--cyan)}
+.grid{display:grid;grid-template-columns:minmax(320px,520px) minmax(320px,1fr);gap:20px}
+.card{background:linear-gradient(180deg,var(--panel),#0b1836);border:1px solid #38e8ff33;border-radius:18px;padding:18px;box-shadow:0 0 0 1px rgba(56,232,255,.06) inset, 0 20px 40px -20px rgba(0,0,0,.6)}
+.ctitle{display:flex;justify-content:space-between;align-items:center;margin:0 0 12px}
+.ctitle h3{margin:0;color:var(--cyan)}
+.fields{display:grid;gap:14px}
+.row{display:grid;gap:10px}
+.row.two{grid-template-columns:1fr 1fr}
+.row.split{grid-template-columns:1fr auto}
+label{font-size:13px;opacity:.95;letter-spacing:.4px}
+input,select{background:rgba(255,255,255,.02);border:1px solid #38e8ff30;color:var(--text);padding:12px 14px;border-radius:12px;outline:none;font-size:16px}
+.hint{opacity:.85;font-size:12px}
+.pill{padding:6px 10px;border:1px solid #38e8ff44;border-radius:999px}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.stat{display:grid;gap:6px}.stat small{color:#9fb7ff}.stat b{font-size:26px}
+.chartWrap{margin-top:14px;height:280px}
+.btn{background:linear-gradient(90deg,#1b2f73,#103a5f);color:#fff;border:1px solid #38e8ff55;padding:10px 14px;border-radius:12px;cursor:pointer}
+.btn:hover{box-shadow:0 0 12px #38e8ff55}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-left:auto}
+.tip{display:inline-block;margin-left:6px;padding:0 6px;border:1px solid #38e8ff55;border-radius:999px;font-weight:700;cursor:help}
+.tip[title]{text-decoration:none}
+.help li{margin:6px 0}
+.toggle{display:flex;gap:10px;align-items:center}
+.switch{width:42px;height:24px;background:#20325f;border:1px solid #38e8ff55;border-radius:999px;position:relative;cursor:pointer}
+.switch input{display:none}
+.switch span{position:absolute;top:2px;left:2px;width:20px;height:20px;background:#38e8ff;border-radius:50%;transition:.2s}
+.switch input:checked + span{left:20px;background:#ff8a2a}
+.legend{opacity:.9;font-size:12px;margin-top:6px}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-  <div class="wrap" id="app">
-    <div class="head">
-      <svg class="logo" viewBox="0 0 24 24"><path fill="#38e8ff" d="M13 2 3 14h6l-2 8 10-12h-6z"/></svg>
-      <div>
-        <div class="brand">ZEUS AI</div>
-        <h1 data-i="title">Compound Interest Calculator</h1>
-      </div>
-      <div class="toolbar">
-        <button class="btn" id="toggleLang">RU / EN</button>
-        <button class="btn" id="shareBtn">Share</button>
-        <button class="btn" id="pngBtn">Export PNG</button>
-        <button class="btn" id="pdfBtn">Export PDF</button>
-        <button class="btn" id="csvBtn">Export CSV</button>
-      </div>
-    </div>
-
-    <div class="grid">
-      <div class="card" id="paramsCard">
-        <div class="ctitle"><h3 data-i="params">Parameters</h3><span class="pill">ZEUS AI</span></div>
-        <div class="fields">
-          <div class="row split">
-            <label title="Starting principal">
-              <div data-i="initial">Initial amount</div>
-              <input type="number" id="initial" value="400000" min="0" />
-            </label>
-            <label title="Display currency symbol">
-              <div data-i="currency">Currency</div>
-              <select id="currency">
-                <option value="₽">₽</option>
-                <option value="$">$</option>
-                <option value="€">€</option>
-                <option value="Rp">Rp</option>
-                <option value="₹">₹</option>
-                <option value="₿">₿</option>
-              </select>
-            </label>
-          </div>
-
-          <div class="row two">
-            <label title="Recurring deposit size">
-              <div data-i="contrib">Periodic contribution</div>
-              <input type="number" id="contrib" value="10000" min="0" />
-            </label>
-            <label title="How often you deposit">
-              <div data-i="contribFreq">Contribution frequency</div>
-              <select id="contribFreq">
-                <option value="0" data-i="none">None</option>
-                <option value="12" selected>Monthly (12)</option>
-                <option value="4">Quarterly (4)</option>
-                <option value="1">Yearly (1)</option>
-              </select>
-            </label>
-          </div>
-
-          <div class="row two">
-            <label title="Nominal annual interest rate">
-              <div data-i="rate">Annual interest rate (%)</div>
-              <input type="number" id="rate" value="5" step="0.01" />
-            </label>
-            <label title="How often interest compounds">
-              <div data-i="compound">Compounding frequency</div>
-              <select id="compound">
-                <option value="12" selected>Monthly (12)</option>
-                <option value="4">Quarterly (4)</option>
-                <option value="1">Yearly (1)</option>
-              </select>
-            </label>
-          </div>
-
-          <div class="row two">
-            <label title="Annual platform/broker fee">
-              <div data-i="fee">Annual fee (%)</div>
-              <input type="number" id="fee" value="0" step="0.01" />
-            </label>
-            <label title="Annual inflation">
-              <div data-i="infl">Inflation (%)</div>
-              <input type="number" id="infl" value="0" step="0.01" />
-            </label>
-          </div>
-
-          <div class="row two">
-            <label title="When deposit is made in each period">
-              <div data-i="timing">Contribution timing</div>
-              <select id="timing">
-                <option value="end" selected data-i="timing_end">End of period</option>
-                <option value="begin" data-i="timing_begin">Beginning of period</option>
-              </select>
-            </label>
-            <label>
-              <div data-i="years">Years</div>
-              <input type="number" id="years" value="4" min="1" />
-            </label>
-          </div>
-
-          <div class="hint" data-i="note">Contributions occur at the end of each contribution period. Interest compounds per selected frequency.</div>
-        </div>
-      </div>
-
-      <div class="card" id="resultsCard">
-        <div class="ctitle"><h3 data-i="results">Results</h3><span class="pill">NEON MODE</span></div>
-        <div class="stats">
-          <div class="stat"><small data-i="final">Final balance</small><b class="accent-c" id="final"></b></div>
-          <div class="stat"><small data-i="totalC">Total contributions</small><b class="accent-o" id="tcontrib"></b></div>
-          <div class="stat"><small data-i="interest">Total interest</small><b class="accent-l" id="tinterest"></b></div>
-        </div>
-
-        <div class="pill" style="margin:10px 0" id="earLine">
-          <span data-i="ear">Effective annual rate</span>: <b id="earVal"></b>
-        </div>
-
-        <div class="chartWrap"><canvas id="chart" aria-label="Growth chart"></canvas></div>
-
-        <div style="margin-top:8px">
-          <table>
-            <thead><tr><th data-i="year">Year</th><th data-i="balance">Balance</th><th data-i="real">Real (after inflation)</th></tr></thead>
-            <tbody id="tbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div class="foot">
-      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#ff8a2a" d="M13 2 3 14h6l-2 8 10-12h-6z"/></svg>
-      <div class="muted" data-i="tip">Tip: set Contributions to 0 to see pure compounding. Values are estimates for education only.</div>
+<div class="wrap" id="app">
+  <div class="head">
+    <svg class="logo" viewBox="0 0 24 24"><path fill="#38e8ff" d="M13 2 3 14h6l-2 8 10-12h-6z"/></svg>
+    <div><div class="brand">ZEUS AI</div><h1>Калькулятор сложных процентов</h1></div>
+    <div class="toolbar">
+      <button class="btn" id="toggleLang">RU / EN</button>
+      <button class="btn" id="shareBtn">Поделиться</button>
+      <button class="btn" id="pngBtn">PNG</button>
+      <button class="btn" id="pdfBtn">PDF</button>
+      <button class="btn" id="csvBtn">CSV</button>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script>
-    const $ = (s)=>document.querySelector(s);
-    const i = (id)=>document.getElementById(id);
+  <div class="grid">
+    <!-- ПАРАМЕТРЫ -->
+    <div class="card">
+      <div class="ctitle"><h3>Параметры</h3><span class="pill">ZEUS AI</span></div>
+      <div class="fields">
+        <div class="row split">
+          <label>
+            <div>Первоначальная сумма <span class="tip" title="Стартовые деньги. Сколько у вас уже есть для старта (можно 0).">i</span></div>
+            <input type="number" id="initial" value="400000" min="0"/>
+          </label>
+          <label>
+            <div>Валюта <span class="tip" title="Это просто знак перед суммой: ₽, $, €, ₿ и т.д.">i</span></div>
+            <select id="currency"><option>₽</option><option>$</option><option>€</option><option>Rp</option><option>₹</option><option>₿</option></select>
+          </label>
+        </div>
 
-    const dict = {
-      en:{ title:"Compound Interest Calculator", params:"Parameters", initial:"Initial amount", currency:"Currency", contrib:"Periodic contribution", contribFreq:"Contribution frequency", none:"None", rate:"Annual interest rate (%)", compound:"Compounding frequency", years:"Years", note:"Contributions occur at the end of each contribution period. Interest compounds per selected frequency.", results:"Results", final:"Final balance", totalC:"Total contributions", interest:"Total interest", year:"Year", balance:"Balance", tip:"Tip: set Contributions to 0 to see pure compounding. Values are estimates for education only.", fee:"Annual fee (%)", infl:"Inflation (%)", timing:"Contribution timing", timing_end:"End of period", timing_begin:"Beginning of period", ear:"Effective annual rate", real:"Real (after inflation)" },
-      ru:{ title:"Калькулятор сложных процентов", params:"Параметры", initial:"Стартовая сумма", currency:"Валюта", contrib:"Регулярное пополнение", contribFreq:"Частота пополнений", none:"Нет", rate:"Годовая ставка (%)", compound:"Частота капитализации", years:"Годы", note:"Пополнение происходит в конце периода. Проценты начисляются по выбранной частоте.", results:"Результаты", final:"Итоговая сумма", totalC:"Всего пополнений", interest:"Начисленные проценты", year:"Год", balance:"Баланс", tip:"Подсказка: установите пополнения 0 — увидите чистую капитализацию. Значения ориентировочные.", fee:"Комиссия в год (%)", infl:"Инфляция (%)", timing:"Момент пополнения", timing_end:"В конце периода", timing_begin:"В начале периода", ear:"Эффективная годовая ставка", real:"Реально (с учётом инфляции)" }
-    };
+        <div class="row two">
+          <label>
+            <div>Регулярное пополнение <span class="tip" title="Сколько вы будете добавлять каждый раз (можно 0).">i</span></div>
+            <input type="number" id="contrib" value="10000" min="0"/>
+          </label>
+          <label>
+            <div>Частота пополнений <span class="tip" title="Как часто пополняете: ежемесячно, ежеквартально или раз в год.">i</span></div>
+            <select id="contribFreq"><option value="0">Нет</option><option value="12" selected>Ежемесячно (12)</option><option value="4">Ежеквартально (4)</option><option value="1">Ежегодно (1)</option></select>
+          </label>
+        </div>
 
-    let lang='ru';
-    const L=(k)=>document.querySelectorAll(`[data-i="${k}"]`).forEach(el=>el.textContent=dict[lang][k]);
-    function applyLang(){ Object.keys(dict[lang]).forEach(L); }
+        <div class="row two">
+          <label>
+            <div>Годовая ставка, % <span class="tip" title="Сколько процентов в год обещает стратегия ДО вычета комиссий.">i</span></div>
+            <input type="number" id="rate" value="5" step="0.01"/>
+          </label>
+          <label>
+            <div>Капитализация <span class="tip" title="Как часто начисляются проценты: чем чаще, тем выше итог.">i</span></div>
+            <select id="compound"><option value="12" selected>Ежемесячно (12)</option><option value="4">Ежеквартально (4)</option><option value="1">Ежегодно (1)</option></select>
+          </label>
+        </div>
 
-    function lcm(a,b){const g=(x,y)=>y===0?x:g(y,x%y);return a*b/g(a,b)}
-    function fmtCurrency(sym, n){ return `${sym} ${n.toLocaleString(undefined,{maximumFractionDigits:2})}`; }
+        <div class="row two">
+          <label>
+            <div>Комиссия в год, % <span class="tip" title="Комиссия площадки/сервиса. Вычитается из доходности.">i</span></div>
+            <input type="number" id="fee" value="0" step="0.01"/>
+          </label>
+          <label>
+            <div>Инфляция, % <span class="tip" title="Оценивает реальную покупательную способность. Показываем сумму с учётом инфляции.">i</span></div>
+            <input type="number" id="infl" value="0" step="0.01"/>
+          </label>
+        </div>
 
-    function compute(params){
-      const {initial, contrib, contribFreq, rate, fee, infl, compound, years, timing} = params;
-      const n = Math.max(1, Math.floor(compound));      // начислений в год
-      const m = Math.max(0, Math.floor(contribFreq));   // пополнений в год (0=нет)
-      const stepsPerYear = (m === 0 ? n : lcm(n, m));
-      const compoundEvery = stepsPerYear / n;
-      const contribEvery = (m === 0 ? Infinity : stepsPerYear / m);
+        <div class="row two">
+          <label>
+            <div>Момент пополнения <span class="tip" title="Когда вносите деньги: в начале периода или в конце. В начале выгоднее.">i</span></div>
+            <select id="timing"><option value="end" selected>В конце периода</option><option value="begin">В начале периода</option></select>
+          </label>
+          <label>
+            <div>Годы <span class="tip" title="Сколько лет вы планируете копить.">i</span></div>
+            <input type="number" id="years" value="4" min="1"/>
+          </label>
+        </div>
 
-      const rNet = (rate - fee) / 100; // простая модель комиссии
+        <div class="hint">Подсказка: установите пополнение = 0, чтобы увидеть <b>чистую капитализацию</b>.</div>
+      </div>
+    </div>
 
-      let balance = +initial || 0;
-      let totalC = 0;
-      let invested = +initial || 0;
+    <!-- РЕЗУЛЬТАТЫ -->
+    <div class="card">
+      <div class="ctitle"><h3>Результаты</h3><span class="pill">NEON MODE</span></div>
+      <div class="stats">
+        <div class="stat"><small>Итоговый баланс</small><b id="final" style="color:var(--cyan)"></b></div>
+        <div class="stat"><small>Всего пополнений</small><b id="tcontrib" style="color:var(--orange)"></b></div>
+        <div class="stat"><small>Начисленные проценты</small><b id="tinterest" style="color:var(--lime)"></b></div>
+      </div>
+      <div class="pill" style="margin:10px 0">Эффективная годовая ставка (EAR): <b id="earVal"></b></div>
 
-      const yearly = [];
-      const investedYearly = [];
+      <div class="toggle" style="margin:6px 0 2px">
+        <label class="switch" title="Включить режим сценариев (3 линии)">
+          <input type="checkbox" id="scenarioOn"><span></span>
+        </label>
+        <div>Сценарии: пессимистичный/база/оптимистичный (± <input id="scenarioDelta" type="number" value="3" step="0.5" style="width:60px"> %)</div>
+      </div>
+      <div class="legend">В сценариях показываем три линии. В обычном режиме — заливаем «Внесено» и «Итог».</div>
 
-      for (let y = 1; y <= years; y++) {
-        for (let s = 1; s <= stepsPerYear; s++) {
-          if (timing === 'begin' && ((s-1) % contribEvery === 0) && contrib > 0) {
-            balance += +contrib; totalC += +contrib; invested += +contrib;
-          }
-          if (s % compoundEvery === 0) {
-            balance *= 1 + (rNet / n);
-          }
-          if (timing === 'end' && (s % contribEvery === 0) && contrib > 0) {
-            balance += +contrib; totalC += +contrib; invested += +contrib;
-          }
-        }
-        const real = infl ? balance / Math.pow(1 + infl/100, y) : balance;
-        yearly.push({ year: y, balance, real });
-        investedYearly.push(invested);
-      }
+      <div class="chartWrap"><canvas id="chart" aria-label="График роста"></canvas></div>
 
-      return {
-        final: balance,
-        totalC,
-        interest: balance - (+initial + totalC),
-        yearly,
-        investedYearly,
-        ear: Math.pow(1 + (rNet / n), n) - 1,
-      };
+      <div style="margin-top:8px">
+        <table style="width:100%;border-collapse:collapse;font-size:14px">
+          <thead><tr><th>Год</th><th>Баланс</th><th>Реально (с инфляцией)</th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ЦЕЛЬ (goal seek) -->
+  <div class="card" style="margin-top:16px">
+    <div class="ctitle"><h3>Цель (Goal seek)</h3><span class="pill">Опционально</span></div>
+    <div class="fields">
+      <div class="row two">
+        <label><div>Хочу получить сумму к году <span class="tip" title="Сколько вы хотите иметь к указанному году.">i</span></div><input id="goalAmount" type="number" value="1000000" min="0"/></label>
+        <label><div>Номер года <span class="tip" title="К какому году прийти к цели (1..N).">i</span></div><input id="goalYear" type="number" value="4" min="1"/></label>
+      </div>
+      <div class="row two">
+        <button class="btn" id="solveGoal">Рассчитать нужное пополнение</button>
+        <div class="hint" id="goalHint">Мы подберём регулярное пополнение при текущих настройках (ставка, капитализация и т.д.).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Пошаговая инструкция -->
+  <div class="card help" style="margin-top:16px">
+    <div class="ctitle"><h3>Как пользоваться (очень просто)</h3></div>
+    <ol>
+      <li><b>Впишите стартовую сумму</b> — сколько уже есть на старте.</li>
+      <li><b>Задайте пополнение и частоту</b> — например, 10 000 ежемесячно.</li>
+      <li><b>Укажите ставку и капитализацию</b> — как часто начисляются проценты.</li>
+      <li>При желании добавьте <b>комиссию</b> и <b>инфляцию</b> — увидите «реальную» сумму.</li>
+      <li><b>Годы</b> — на какой срок планируете.</li>
+      <li>Нажимать ничего не нужно — расчёт идёт автоматически. <b>График</b> и <b>таблица</b> обновляются сразу.</li>
+      <li>Хотите цель? В блоке <b>Цель</b> введите сумму и год → кнопка «Рассчитать нужное пополнение».</li>
+      <li>Хотите варианты? Включите <b>Сценарии</b> — увидите 3 линии для разных исходов.</li>
+    </ol>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script>
+const $ = (s)=>document.querySelector(s);
+const i = (id)=>document.getElementById(id);
+
+function lcm(a,b){const g=(x,y)=>y===0?x:g(y,x%y);return a*b/g(a,b)}
+function fmt(sym,n){return `${sym} ${(+n).toLocaleString(undefined,{maximumFractionDigits:2})}`;}
+
+function simulate(params){
+  const {initial,contrib,contribFreq,rate,fee,infl,compound,years,timing} = params;
+  const n = Math.max(1, Math.floor(compound));
+  const m = Math.max(0, Math.floor(contribFreq));
+  const steps = (m===0? n : lcm(n,m));
+  const compoundEvery = steps/n;
+  const contribEvery = (m===0? Infinity : steps/m);
+  const rNet = (rate - fee)/100;
+
+  let bal = +initial||0, totalC=0, invested = +initial||0;
+  const yearly=[], investedYearly=[];
+
+  for(let y=1; y<=years; y++){
+    for(let s=1;s<=steps;s++){
+      if(timing==='begin' && ((s-1)%contribEvery===0) && contrib>0){ bal+=+contrib; totalC+=+contrib; invested+=+contrib; }
+      if(s%compoundEvery===0){ bal *= 1 + (rNet/n); }
+      if(timing==='end' && (s%contribEvery===0) && contrib>0){ bal+=+contrib; totalC+=+contrib; invested+=+contrib; }
     }
+    const real = infl ? bal / Math.pow(1+infl/100, y) : bal;
+    yearly.push({year:y, balance:bal, real});
+    investedYearly.push(invested);
+  }
+  const ear = Math.pow(1 + (rNet/n), n) - 1;
+  return {final:bal,totalC,interest:bal-(+initial+totalC),yearly,investedYearly,ear};
+}
 
-    let chart;
-    function render(){
-      const params={
-        initial:+i('initial').value,
-        contrib:+i('contrib').value,
-        contribFreq:+i('contribFreq').value,
-        rate:+i('rate').value,
-        fee:+i('fee').value,
-        infl:+i('infl').value,
-        compound:+i('compound').value,
-        years:+i('years').value,
-        currency:i('currency').value,
-        timing:i('timing').value
-      };
-      const r=compute(params);
-      i('final').textContent=fmtCurrency(params.currency,r.final);
-      i('tcontrib').textContent=fmtCurrency(params.currency,r.totalC);
-      i('tinterest').textContent=fmtCurrency(params.currency,r.interest);
-      i('earVal').textContent=((r.ear*100).toFixed(2))+'%';
+// Goal seek: find contribution to reach target by year Y (binary search)
+function solveContribution(target, year, baseParams){
+  let low=0, high=target||1;
+  function val(c){
+    const r = simulate({...baseParams, contrib:c});
+    const y = r.yearly[Math.min(year-1, r.yearly.length-1)];
+    return y ? y.balance : r.final;
+  }
+  while(val(high) < target) high *= 2; // expand
+  for(let k=0;k<60;k++){
+    const mid=(low+high)/2;
+    if(val(mid) >= target) high=mid; else low=mid;
+  }
+  return high;
+}
 
-      const tb=i('tbody'); tb.innerHTML='';
-      r.yearly.forEach((y, idx)=>{
-        const tr=document.createElement('tr');
-        tr.innerHTML=`<td>${y.year}</td><td>${fmtCurrency(params.currency,y.balance)}</td><td>${fmtCurrency(params.currency,y.real)}</td>`;
-        tb.appendChild(tr);
-      });
+let chart;
+function render(){
+  const params={
+    initial:+i('initial').value,
+    contrib:+i('contrib').value,
+    contribFreq:+i('contribFreq').value,
+    rate:+i('rate').value,
+    fee:+i('fee').value,
+    infl:+i('infl').value,
+    compound:+i('compound').value,
+    years:+i('years').value,
+    currency:i('currency').value,
+    timing:i('timing').value
+  };
 
-      const labels=r.yearly.map(y=>y.year);
-      const invested=r.investedYearly;
-      const total=r.yearly.map(y=>y.balance);
-      if(chart) chart.destroy();
-      chart=new Chart(i('chart').getContext('2d'),{
-        type:'line',
-        data:{labels, datasets:[
-          {label:(lang==='ru'?'Внесено':'Invested'), data:invested, borderColor:'#ff8a2a', backgroundColor:'rgba(255,138,42,.18)', tension:.25, fill:true},
-          {label:(lang==='ru'?'Итог':'Total'), data:total, borderColor:'#38e8ff', backgroundColor:'rgba(56,232,255,.15)', tension:.25, fill:'-1'}
-        ]},
-        options:{plugins:{legend:{display:true, labels:{color:'#d7eaff'}}}, scales:{x:{ticks:{color:'#9fb7ff'}}, y:{ticks:{color:'#9fb7ff'}}}}
-      });
+  const r = simulate(params);
+  i('final').textContent = fmt(params.currency, r.final);
+  i('tcontrib').textContent = fmt(params.currency, r.totalC);
+  i('tinterest').textContent = fmt(params.currency, r.interest);
+  i('earVal').textContent = (r.ear*100).toFixed(2) + '%';
 
-      const q=new URLSearchParams(params).toString();
-      history.replaceState(null,'',`?${q}`);
-    }
+  // Table
+  const tb = i('tbody'); tb.innerHTML='';
+  r.yearly.forEach(y=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${y.year}</td><td>${fmt(params.currency,y.balance)}</td><td>${fmt(params.currency,y.real)}</td>`;
+    tb.appendChild(tr);
+  });
 
-    (function initFromQuery(){
-      const qs=new URLSearchParams(location.search);
-      const map={initial:'initial',contrib:'contrib',contribFreq:'contribFreq',rate:'rate',compound:'compound',years:'years',currency:'currency',fee:'fee',infl:'infl',timing:'timing'};
-      Object.entries(map).forEach(([k,id])=>{ if(qs.get(k)!=null) i(id).value=qs.get(k); });
-      lang = (qs.get('lang')==='en')? 'en' : 'ru';
-      applyLang();
-    })();
+  const ctx = i('chart').getContext('2d');
+  if(chart) chart.destroy();
 
-    ['initial','contrib','contribFreq','rate','fee','infl','compound','years','currency','timing'].forEach(id=> i(id).addEventListener('input', render));
-
-    i('toggleLang').addEventListener('click',()=>{ lang = (lang==='en'?'ru':'en'); applyLang(); render(); });
-
-    i('shareBtn').addEventListener('click',async()=>{
-      const url=location.href;
-      try{ await navigator.clipboard.writeText(url); alert((lang==='ru')?'Ссылка скопирована!':'Link copied!'); }catch(e){ prompt('Copy URL', url); }
+  if(i('scenarioOn').checked){
+    const delta = Math.max(0, +i('scenarioDelta').value||0);
+    const pess = simulate({...params, rate: params.rate - delta});
+    const opt  = simulate({...params, rate: params.rate + delta});
+    chart = new Chart(ctx, {
+      type:'line',
+      data:{
+        labels: r.yearly.map(y=>y.year),
+        datasets:[
+          {label:'Пессимистичный', data: pess.yearly.map(y=>y.balance), borderColor:'#ff5bbd', backgroundColor:'transparent', tension:.25},
+          {label:'Базовый', data: r.yearly.map(y=>y.balance), borderColor:'#38e8ff', backgroundColor:'transparent', tension:.25},
+          {label:'Оптимистичный', data: opt.yearly.map(y=>y.balance), borderColor:'#9cff70', backgroundColor:'transparent', tension:.25}
+        ]
+      },
+      options:{plugins:{legend:{labels:{color:'#d7eaff'}}}, scales:{x:{ticks:{color:'#9fb7ff'}}, y:{ticks:{color:'#9fb7ff'}}}}
     });
-
-    async function exportPNG(){
-      const node=$('#app'); const canvas=await html2canvas(node,{backgroundColor:null, scale:2});
-      const link=document.createElement('a'); link.download='zeus-ai-calculator.png'; link.href=canvas.toDataURL(); link.click();
-    }
-    async function exportPDF(){
-      const node=$('#app'); const canvas=await html2canvas(node,{backgroundColor:'#0b1330', scale:2});
-      const imgData=canvas.toDataURL('image/png'); const { jsPDF } = window.jspdf; const pdf=new jsPDF('p','pt','a4');
-      const w=pdf.internal.pageSize.getWidth();
-      const h=canvas.height * (w/canvas.width);
-      pdf.addImage(imgData,'PNG',0,0,w,h); pdf.save('zeus-ai-calculator.pdf');
-    }
-    function exportCSV(data){
-      let csv = 'Year,Invested,Total,Growth,Real\n';
-      data.yearly.forEach((y, idx) => {
-        const inv = data.investedYearly[idx];
-        const growth = y.balance - inv;
-        csv += `${y.year},${inv},${y.balance},${growth},${y.real}\n`;
-      });
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'zeus-ai-projection.csv';
-      a.click();
-    }
-    i('pngBtn').addEventListener('click', exportPNG);
-    i('pdfBtn').addEventListener('click', exportPDF);
-    i('csvBtn').addEventListener('click', ()=>{
-      const params={
-        initial:+i('initial').value,
-        contrib:+i('contrib').value,
-        contribFreq:+i('contribFreq').value,
-        rate:+i('rate').value,
-        fee:+i('fee').value,
-        infl:+i('infl').value,
-        compound:+i('compound').value,
-        years:+i('years').value,
-        currency:i('currency').value,
-        timing:i('timing').value
-      };
-      exportCSV(compute(params));
+  } else {
+    // Stacked area: invested vs total (base)
+    chart = new Chart(ctx, {
+      type:'line',
+      data:{
+        labels: r.yearly.map(y=>y.year),
+        datasets:[
+          {label:'Внесено', data: r.investedYearly, borderColor:'#ff8a2a', backgroundColor:'rgba(255,138,42,.18)', fill:true, tension:.25},
+          {label:'Итог', data: r.yearly.map(y=>y.balance), borderColor:'#38e8ff', backgroundColor:'rgba(56,232,255,.15)', fill:'-1', tension:.25}
+        ]
+      },
+      options:{plugins:{legend:{labels:{color:'#d7eaff'}}}, scales:{x:{ticks:{color:'#9fb7ff'}}, y:{ticks:{color:'#9fb7ff'}}}}
     });
+  }
+}
 
-    render();
-  </script>
+['initial','contrib','contribFreq','rate','fee','infl','compound','years','currency','timing','scenarioOn','scenarioDelta']
+  .forEach(id=> i(id).addEventListener('input', render));
+
+i('solveGoal').addEventListener('click', ()=>{
+  const target = +i('goalAmount').value||0;
+  const gy = +i('goalYear').value||1;
+  const params={
+    initial:+i('initial').value,
+    contrib:+i('contrib').value,
+    contribFreq:+i('contribFreq').value||12,
+    rate:+i('rate').value,
+    fee:+i('fee').value,
+    infl:+i('infl').value,
+    compound:+i('compound').value,
+    years:+i('years').value,
+    currency:i('currency').value,
+    timing:i('timing').value
+  };
+  if(params.contribFreq===0){ params.contribFreq=12; i('contribFreq').value=12; }
+  const need = solveContribution(target, gy, params);
+  i('contrib').value = Math.round(need*100)/100;
+  render();
+  i('goalHint').textContent = 'Чтобы к '+gy+' году получить ~'+fmt(params.currency,target)+', внесение ≈ '+fmt(params.currency, i('contrib').value)+' за период.';
+});
+
+// share / export
+i('shareBtn').addEventListener('click', async ()=>{
+  const url = location.href;
+  try{ await navigator.clipboard.writeText(url); alert('Ссылка скопирована!'); }catch(e){ prompt('Скопируйте ссылку:', url); }
+});
+async function exportPNG(){
+  const node=$('.wrap'); const canvas=await html2canvas(node,{backgroundColor:'#0b1330',scale:2});
+  const link=document.createElement('a'); link.download='zeus-ai-calculator.png'; link.href=canvas.toDataURL(); link.click();
+}
+async function exportPDF(){
+  const node=$('.wrap'); const canvas=await html2canvas(node,{backgroundColor:'#0b1330',scale:2});
+  const imgData=canvas.toDataURL('image/png'); const { jsPDF } = window.jspdf; const pdf=new jsPDF('p','pt','a4');
+  const w=pdf.internal.pageSize.getWidth(); const h=canvas.height*(w/canvas.width);
+  pdf.addImage(imgData,'PNG',0,0,w,h); pdf.save('zeus-ai-calculator.pdf');
+}
+function exportCSV(){
+  // Export base scenario yearly table
+  const params={
+    initial:+i('initial').value, contrib:+i('contrib').value, contribFreq:+i('contribFreq').value,
+    rate:+i('rate').value, fee:+i('fee').value, infl:+i('infl').value,
+    compound:+i('compound').value, years:+i('years').value, currency:i('currency').value, timing:i('timing').value
+  };
+  const r = simulate(params);
+  let csv='Year,Balance,Real\\n';
+  r.yearly.forEach(y=> csv+=`${y.year},${y.balance},${y.real}\\n` );
+  const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='zeus-ai-table.csv'; a.click();
+}
+i('pngBtn').addEventListener('click', exportPNG);
+i('pdfBtn').addEventListener('click', exportPDF);
+i('csvBtn').addEventListener('click', exportCSV);
+
+render();
+</script>
 </body>
 </html>
