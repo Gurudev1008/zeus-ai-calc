@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -6,180 +7,116 @@
 <title>ZEUS AI • Калькулятор сложных процентов</title>
 <link rel="icon" href="../assets/favicon.svg"/>
 <style>
-:root{
-  --bg:#0b1330;--panel:#0f1d3f;--text:#d7eaff;--muted:#9fb7ff;
-  --cyan:#38e8ff;--orange:#ff8a2a;--lime:#9cff70;--pink:#ff5bbd;
-  --tipbg:#0c1a3a;--border:#38e8ff33
-}
-*{box-sizing:border-box}
-body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto;color:var(--text);
-  background:
-    radial-gradient(1000px 600px at 85% 10%, rgba(56,232,255,.08) 0%, rgba(56,232,255,0) 70%),
-    radial-gradient(1200px 600px at 10% 0%,#13214a 0%,#0b1330 55%,#081027 100%)
-}
-.wrap{max-width:1160px;margin:24px auto;padding:0 16px}
+:root{--bg:#0b1330;--panel:#0f1d3f;--text:#d7eaff;--muted:#9fb7ff;--cyan:#38e8ff;--orange:#ff8a2a;--lime:#9cff70;--pink:#ff5bbd;--border:#38e8ff33;--tipbg:#0c1a3a}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto;color:var(--text);
+  background:radial-gradient(900px 540px at 85% 10%, rgba(56,232,255,.08) 0%, rgba(56,232,255,0) 70%),
+             radial-gradient(1100px 560px at 10% 0%,#13214a 0%,#0b1330 55%,#081027 100%)}
+.wrap{max-width:1280px;margin:24px auto;padding:0 16px}
 .head{display:flex;gap:12px;align-items:center;margin-bottom:18px;position:sticky;top:0;z-index:20;background:linear-gradient(180deg,rgba(11,19,48,.9),rgba(11,19,48,.6));backdrop-filter:blur(6px);border-bottom:1px solid var(--border);padding:10px 12px;border-radius:12px}
 .logo{width:28px;height:28px;filter:drop-shadow(0 0 8px rgba(56,232,255,.4))}
-.brand{font-size:13px;letter-spacing:1.6px;color:#9bdfff}
-h1{margin:0;font-size:26px;color:var(--cyan);letter-spacing:.4px}
-.grid{display:grid;grid-template-columns:minmax(340px,560px) minmax(360px,1fr);gap:22px}
-.card{background:linear-gradient(180deg,var(--panel),#0b1836);border:1px solid var(--border);border-radius:18px;padding:18px;
-  box-shadow:0 0 0 1px rgba(56,232,255,.06) inset, 0 24px 48px -24px rgba(0,0,0,.6), inset 0 30px 80px -60px rgba(56,232,255,.2)}
+.brand{font-size:13px;letter-spacing:1.6px;color:#9bdfff} h1{margin:0;font-size:26px;color:var(--cyan)}
+.grid{display:grid;grid-template-columns:minmax(460px,560px) minmax(520px,1fr);gap:22px}
+.card{background:linear-gradient(180deg,var(--panel),#0b1836);border:1px solid var(--border);border-radius:18px;padding:18px;box-shadow:0 0 0 1px rgba(56,232,255,.06) inset, 0 24px 48px -24px rgba(0,0,0,.6), inset 0 30px 80px -60px rgba(56,232,255,.2)}
 .ctitle{display:flex;justify-content:space-between;align-items:center;margin:0 0 12px}
 .ctitle h3{margin:0;color:var(--cyan)}
 .fields{display:grid;gap:14px}
 .row{display:grid;gap:10px}
 .row.two{grid-template-columns:1fr 1fr}
-.row.split{grid-template-columns:1fr auto}
-label{font-size:13px;opacity:.95;letter-spacing:.4px}
-input,select,button{font-family:inherit}
+.row.three{grid-template-columns:1fr 1fr 1fr}
+label{font-size:13px;letter-spacing:.4px}
 input,select{background:rgba(255,255,255,.02);border:1px solid #38e8ff30;color:var(--text);padding:12px 14px;border-radius:12px;outline:none;font-size:16px}
 .hint{opacity:.9;color:var(--muted);font-size:12px}
 .pill{padding:6px 10px;border:1px solid #38e8ff44;border-radius:999px}
 .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 .stat{display:grid;gap:6px}.stat small{color:var(--muted)}.stat b{font-size:26px}
-.chartWrap{margin-top:14px;height:320px}
-.btn{background:linear-gradient(90deg,#1b2f73,#103a5f);color:#fff;border:1px solid #38e8ff55;padding:10px 14px;border-radius:12px;cursor:pointer}
-.btn:hover{box-shadow:0 0 12px #38e8ff55}
-.btn.ghost{background:rgba(255,255,255,.04)}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-left:auto}
-.segment{display:inline-flex;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.segment input{display:none}
-.segment label{padding:8px 10px;font-size:13px;color:#cfeaff;cursor:pointer}
-.segment input:checked + label{background:#12305e;border-left:1px solid #38e8ff55;border-right:1px solid #38e8ff55;color:#fff}
-.sense{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
-.sense .item{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:10px}
-.sense .item label{display:flex;justify-content:space-between;align-items:center}
-.sense input[type=range]{width:100%}
-.tip{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;line-height:18px;background:#112552;border:1px solid #38e8ff80;border-radius:50%;font-size:11px;font-weight:700;color:#9bdfff;cursor:help;position:relative;margin-left:6px}
-.tip::after{content:attr(data-tip);position:absolute;bottom:130%;left:50%;transform:translateX(-50%) scale(.95);opacity:0;pointer-events:none;background:var(--tipbg);color:#d7eaff;border:1px solid #38e8ff80;border-radius:10px;padding:10px 12px;min-width:220px;max-width:340px;box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 20px #38e8ff33;transition:.15s ease;z-index:50}
+.tip{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;background:#112552;border:1px solid #38e8ff80;border-radius:50%;font-size:11px;font-weight:700;color:#9bdfff;cursor:help;position:relative;margin-left:6px}
+.tip::after{content:attr(data-tip);position:absolute;bottom:130%;left:50%;transform:translateX(-50%) scale(.95);opacity:0;pointer-events:none;background:var(--tipbg);color:#d7eaff;border:1px solid #38e8ff80;border-radius:10px;padding:10px 12px;min-width:220px;max-width:360px;box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 20px #38e8ff33;transition:.15s ease;z-index:50}
 .tip::before{content:"";position:absolute;bottom:120%;left:50%;transform:translateX(-50%);border:8px solid transparent;border-top-color:var(--tipbg);opacity:0;transition:.15s ease;z-index:49}
-.tip:hover::after,.tip:hover::before,.tip:focus-visible::after,.tip:focus-visible::before,.tip.open::after,.tip.open::before{opacity:1;transform:translateX(-50%) scale(1)}
-@media (hover:none){.tip{cursor:pointer}}
+.tip:hover::after,.tip:hover::before,.tip.open::after,.tip.open::before{opacity:1;transform:translateX(-50%) scale(1)}
 .legend{opacity:.9;font-size:12px;margin-top:6px}
-.help li{margin:6px 0}
-.kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}
-.kpi .mini{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:10px;display:grid;gap:6px}
-.kpi .mini .val{font-weight:700}
-.actionBar{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);z-index:30;display:none;gap:8px;background:rgba(13,22,50,.75);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:14px;padding:8px 10px}
-@media (max-width:860px){.grid{grid-template-columns:1fr}.kpi{grid-template-columns:1fr}.actionBar{display:flex}}
-/* Affiliate */
-.affGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-@media (max-width:860px){.affGrid{grid-template-columns:1fr 1fr}}
+.kpiRow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.kpi{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:10px;display:grid;gap:4px}
+.kpi .title{color:var(--muted);font-size:12px}
+.kpi .value{font-weight:700}
 .kpiAff{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
 .kpiAff .mini{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:10px;display:grid;gap:6px}
+.kpiAff .mini .val{font-weight:700}
+.lvlKPI{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px}
+.lvlKPI .box{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:10px;display:grid;gap:4px}
+@media (max-width:980px){.grid{grid-template-columns:1fr}.kpiRow{grid-template-columns:1fr}.kpiAff{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.lvlKPI{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
-<div class="wrap" id="app">
+<div class="wrap">
   <div class="head">
     <svg class="logo" viewBox="0 0 24 24"><path fill="#38e8ff" d="M13 2 3 14h6l-2 8 10-12h-6z"/></svg>
     <div><div class="brand">ZEUS AI</div><h1>Калькулятор сложных процентов</h1></div>
-    <div class="toolbar">
-      <button class="btn ghost" id="resetBtn" title="Сбросить на значения по умолчанию">Сброс</button>
-      <button class="btn" id="helpBtn">Инструкция</button>
-      <button class="btn" id="shareBtn">Поделиться</button>
-      <button class="btn" id="pngBtn">PNG</button>
-      <button class="btn" id="pdfBtn">PDF</button>
-      <button class="btn" id="csvBtn">CSV</button>
-    </div>
   </div>
 
   <div class="grid">
     <div class="card">
       <div class="ctitle"><h3>Параметры</h3><span class="pill">ZEUS AI</span></div>
+
       <div class="fields">
-        <div class="row" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <div class="segment">
-            <input type="radio" id="modeAnnual" name="mode" value="annual" checked><label for="modeAnnual">Годовая ставка</label>
-            <input type="radio" id="modeMonthly" name="mode" value="monthly"><label for="modeMonthly">Месячная ставка</label>
-          </div>
-          <label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="useAvgEar"/><span class="hint">использовать среднюю годовую (с колебаниями)</span></label>
-        </div>
+        <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="useAvg" checked/> использовать среднюю годовую (с колебаниями)</label>
 
-        <div class="row split">
-          <label><div>Первоначальная сумма <span class="tip" data-tip="Стартовые деньги. Сколько у вас уже есть для старта (можно 0).">i</span></div><input type="number" id="initial" value="400000" min="0"/></label>
-          <label><div>Валюта <span class="tip" data-tip="Это только знак перед суммой: ₽, $, €, ₿ и т.д.">i</span></div><select id="currency"><option>₽</option><option>$</option><option>€</option><option>Rp</option><option>₹</option><option>₿</option></select></label>
+        <div class="row two">
+          <label><div>Мой депозит <span class="tip" data-tip="Сколько вы вносите на старте. Порог партнёрки: 1–2 уровни ≥ $3k, 3-й ≥ $10k, 4-й ≥ $20k.">i</span></div><input type="number" id="initial" value="3000" min="0"/></label>
+          <label><div>Валюта</div><select id="currency"><option>$</option><option>₽</option><option>€</option><option>Rp</option><option>₹</option></select></label>
+        </div>
+        <div class="row two">
+          <label><div>Регулярное пополнение</div><input type="number" id="contrib" value="1000" min="0"/></label>
+          <label><div>Частота пополнений</div><select id="contribFreq"><option value="0">Нет</option><option value="12" selected>Ежемесячно (12)</option><option value="4">Ежеквартально (4)</option><option value="1">Ежегодно (1)</option></select></label>
         </div>
 
         <div class="row two">
-          <label><div>Регулярное пополнение <span class="tip" data-tip="Сколько вы будете добавлять каждый раз (можно 0).">i</span></div><input type="number" id="contrib" value="10000" min="0"/></label>
-          <label><div>Частота пополнений <span class="tip" data-tip="Как часто пополняете: ежемесячно, ежеквартально или раз в год.">i</span></div><select id="contribFreq"><option value="0">Нет</option><option value="12" selected>Ежемесячно (12)</option><option value="4">Ежеквартально (4)</option><option value="1">Ежегодно (1)</option></select></label>
+          <label><div>Годовая ставка, % <span class="tip" data-tip="Меняете годовую — пересчитаем месячную.">i</span></div><input type="number" id="rate" value="100.8975" step="0.0001"/></label>
+          <label><div>Месячная ставка, % <span class="tip" data-tip="Меняете месячную — пересчитаем годовую (EAR).">i</span></div><input type="number" id="mrate" value="6" step="0.01"/></label>
         </div>
 
         <div class="row two">
-          <label><div>Годовая ставка, % <span class="tip" data-tip="Ожидаемая доходность в год ДО комиссий. В месячном режиме — пересчитывается автоматически.">i</span></div><input type="number" id="rate" value="5" step="0.01"/></label>
-          <label><div>Капитализация <span class="tip" data-tip="Как часто начисляются проценты: чем чаще, тем выше итог.">i</span></div><select id="compound"><option value="12" selected>Ежемесячно (12)</option><option value="4">Ежеквартально (4)</option><option value="1">Ежегодно (1)</option></select></label>
+          <label><div>Капитализация</div><select id="compound"><option value="12" selected>Ежемесячно (12)</option><option value="4">Ежеквартально (4)</option><option value="1">Ежегодно (1)</option></select></label>
+          <label><div>Колебания в месяц, % <span class="tip" data-tip="На сколько месячная ставка может колебаться вверх/вниз. Используем для оценки средней годовой.">i</span></div><input type="number" id="vol" value="3" step="0.1"/></label>
         </div>
 
-        <div class="row two" id="monthlyInputs" style="display:none">
-          <label><div>Месячная ставка, % <span class="tip" data-tip="Сколько процентов в месяц. От неё автоматически считаем годовую (EAR).">i</span></div><input type="number" id="mrate" value="2.0" step="0.01"/></label>
-          <label><div>Колебания в месяц, ±% <span class="tip" data-tip="На сколько ставка может колебаться вверх/вниз каждый месяц. Используем для оценки средней годовой.">i</span></div><input type="number" id="mvol" value="3.0" step="0.1"/></label>
-        </div>
-
-        <div class="kpi" id="monthlyKPI" style="display:none">
-          <div class="mini"><div class="label">Годовая из месячной (EAR)</div><div class="val" id="earFromMonthly">—</div><div class="hint">Формула: (1 + m)^12 − 1</div></div>
-          <div class="mini"><div class="label">Диапазон годовой (±)</div><div class="val" id="earRange">—</div><div class="hint">Нижняя и верхняя при m±δ</div></div>
-          <div class="mini"><div class="label">Средняя годовая (колебания)</div><div class="val" id="earAvg">—</div><div class="hint">Геометрическое ожидание для m∈[m−δ; m+δ]</div></div>
+        <div class="kpiRow">
+          <div class="kpi"><div class="title">Годовая из месячной (EAR)</div><div class="value" id="kpiEar">—</div><div class="hint">Формула: (1+m)^12 − 1</div></div>
+          <div class="kpi"><div class="title">Диапазон годовой (±)</div><div class="value" id="kpiRange">—</div><div class="hint">Нижняя/верхняя при m±δ</div></div>
+          <div class="kpi"><div class="title">Средняя годовая (колебания)</div><div class="value" id="kpiGeo">—</div><div class="hint">Геометрическое ожидание по m−δ, m, m+δ</div></div>
         </div>
 
         <div class="row two">
-          <label><div>Комиссия в год, % <span class="tip" data-tip="Комиссия сервиса/биржи. Вычитается из доходности.">i</span></div><input type="number" id="fee" value="0" step="0.01"/></label>
-          <label><div>Инфляция, % <span class="tip" data-tip="Показываем сумму с учётом инфляции (реальная покупательная способность).">i</span></div><input type="number" id="infl" value="0" step="0.01"/></label>
+          <label><div>Комиссия в год, %</div><input type="number" id="fee" value="0.01" step="0.01"/></label>
+          <label><div>Инфляция, %</div><input type="number" id="infl" value="0" step="0.01"/></label>
         </div>
 
         <div class="row two">
-          <label><div>Момент пополнения <span class="tip" data-tip="Когда вносите деньги: начало или конец периода. В начале выгоднее.">i</span></div><select id="timing"><option value="end" selected>В конце периода</option><option value="begin">В начале периода</option></select></label>
-          <label><div>Годы <span class="tip" data-tip="Сколько лет вы планируете копить.">i</span></div><input type="number" id="years" value="4" min="1"/></label>
+          <label><div>Момент пополнения</div><select id="timing"><option value="end" selected>В конце периода</option><option value="begin">В начале периода</option></select></label>
+          <label><div>Годы</div><input type="number" id="years" value="3" min="1"/></label>
         </div>
 
-        <div class="sense">
-          <div class="item"><label>Чувствительность ставки ±<span id="senseRateVal">0%</span></label><input type="range" id="senseRate" min="-10" max="10" step="0.25" value="0"/></div>
-          <div class="item"><label>Чувствительность пополнения ±<span id="senseContribVal">0%</span></label><input type="range" id="senseContrib" min="-50" max="50" step="1" value="0"/></div>
+        <div class="row two">
+          <label><div>Чувствительность ставки ± (UI)</div><input type="range" id="sensRate" min="0" max="20" step="0.5" value="0"/></label>
+          <label><div>Чувствительность пополнения ± (UI)</div><input type="range" id="sensContrib" min="0" max="5000" step="50" value="0"/></label>
         </div>
-
-        <div class="hint">Подсказка: поставьте пополнение = 0, чтобы увидеть <b>чистую капитализацию</b>. Легенда графика кликабельна — можно скрывать линии.</div>
+        <div class="hint">Подсказка: поставьте пополнение = 0, чтобы увидеть чистую капитализацию. Легенда графика кликабельна — можно скрывать линии.</div>
       </div>
     </div>
 
     <div class="card">
       <div class="ctitle"><h3>Результаты</h3><span class="pill">NEON MODE</span></div>
       <div class="stats">
-        <div class="stat"><small>Итоговый баланс</small><b id="final" style="color:var(--cyan)"></b></div>
-        <div class="stat"><small>Всего пополнений</small><b id="tcontrib" style="color:var(--orange)"></b></div>
-        <div class="stat"><small>Начисленные проценты</small><b id="tinterest" style="color:var(--lime)"></b></div>
+        <div class="stat"><small>Итоговый баланс</small><b id="final" style="color:var(--cyan)">—</b></div>
+        <div class="stat"><small>Всего пополнений</small><b id="tcontrib" style="color:var(--orange)">—</b></div>
+        <div class="stat"><small>Начисленные проценты</small><b id="tinterest" style="color:var(--lime)">—</b></div>
       </div>
-      <div class="pill" style="margin:10px 0">Эффективная годовая ставка (EAR): <b id="earVal"></b></div>
-
-      <div style="display:flex;gap:12px;align-items:center;margin:6px 0 2px">
-        <label style="display:flex;gap:8px;align-items:center" title="Включить режим сценариев (3 линии)"><input type="checkbox" id="scenarioOn"/> Сценарии</label>
-        <label>± <input id="scenarioDelta" type="number" value="3" step="0.5" style="width:60px"> %</label>
-      </div>
-      <div class="legend">В сценариях рисуем три линии (пессимистичный/база/оптимистичный). В обычном режиме — «Итог» + «Цель» с заливкой «разницы».</div>
-
-      <div class="chartWrap"><canvas id="chart" aria-label="График роста"></canvas></div>
-
-      <div style="margin-top:8px">
-        <div class="hint" id="goalDeltaText"></div>
-        <table style="width:100%;border-collapse:collapse;font-size:14px">
-          <thead><tr><th>Год</th><th>Баланс</th><th>Реально (с инфляцией)</th></tr></thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <div class="card" style="margin-top:16px">
-    <div class="ctitle"><h3>Цель (Goal seek)</h3><span class="pill">Опционально</span></div>
-    <div class="fields">
-      <div class="row two">
-        <label><div>Хочу получить сумму к году <span class="tip" data-tip="Сколько вы хотите иметь к указанному году.">i</span></div><input id="goalAmount" type="number" value="1000000" min="0"/></label>
-        <label><div>Номер года <span class="tip" data-tip="К какому году прийти к цели (1..N).">i</span></div><input id="goalYear" type="number" value="4" min="1"/></label>
-      </div>
-      <div class="row two" style="align-items:center">
-        <button class="btn" id="solveGoal">Рассчитать нужное пополнение</button>
-        <div class="hint" id="goalHint">Подберём регулярное пополнение при текущих настройках (ставка, капитализация и т.д.).</div>
-      </div>
+      <div class="pill" style="margin:10px 0">Эффективная годовая ставка (EAR): <b id="earVal">—</b></div>
+      <div style="display:flex;gap:10px;align-items:center;margin:6px 0"><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="scenOn" checked/> Сценарии</label><label>± <input type="number" id="scenPct" value="3" step="0.1" style="width:90px"> %</label></div>
+      <canvas id="chart" height="320"></canvas>
+      <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:8px">
+        <thead><tr><th>Год</th><th>Баланс</th><th>Реально (с инфляцией)</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
     </div>
   </div>
 
@@ -187,200 +124,207 @@ input,select{background:rgba(255,255,255,.02);border:1px solid #38e8ff30;color:v
     <div class="ctitle"><h3>Партнёрская программа (копитрейдинг)</h3><span class="pill">Доход от сети</span></div>
     <div class="fields">
       <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="affOn" checked/> Учитывать партнёрские вознаграждения</label>
-      <div class="hint">Ваш доход: <b>50% от собственной прибыли</b> (минимальный депозит — <b>$3,000</b>). Доход от участников: 1-й уровень — <b>5%</b>, 2-й — <b>8%</b>, 3-й — <b>10%</b>, 4-й — <b>2%</b>. Уровни открываются: 1–2 ≥ $3k, 3 ≥ $10k, 4 ≥ $20k.</div>
+
+      <div class="row three">
+        <label><div>Месяцев учёта</div><input type="number" id="affMonths" value="36" min="1"/></label>
+        <label><div>Партнёров 1-го уровня</div><input type="number" id="affL1" value="20" min="0"/></label>
+        <label><div>Партнёров 2-го уровня</div><input type="number" id="affL2" value="50" min="0"/></label>
+      </div>
       <div class="row two">
-        <label><div>Средняя прибыль одного партнёра в месяц <span class="tip" data-tip="Оценка прибыли одного участника в месяц (в валюте калькулятора).">i</span></div><input type="number" id="affAvg" value="200" step="1" min="0"/></label>
-        <label><div>Месяцев учёта (обычно = годы × 12) <span class="tip" data-tip="Сколько месяцев учитывать для расчёта партнёрского дохода. По умолчанию берём годы × 12.">i</span></div><input type="number" id="affMonths" value="48" step="1" min="1"/></label>
+        <label><div>Партнёров 3-го уровня</div><input type="number" id="affL3" value="100" min="0"/></label>
+        <label><div>Партнёров 4-го уровня</div><input type="number" id="affL4" value="300" min="0"/></label>
       </div>
-      <div class="affGrid">
-        <label><div>Партнёров 1-го уровня <span class="tip" data-tip="Лично приглашённые участники. Доступно при депозите ≥ $3,000.">i</span></div><input type="number" id="affL1" value="5" min="0"/></label>
-        <label><div>Партнёров 2-го уровня <span class="tip" data-tip="Участники, приглашённые вашими 1-м уровнем. Доступно при депозите ≥ $3,000.">i</span></div><input type="number" id="affL2" value="10" min="0"/></label>
-        <label><div>Партнёров 3-го уровня <span class="tip" data-tip="Открывается при депозите ≥ $10,000.">i</span></div><input type="number" id="affL3" value="0" min="0"/></label>
-        <label><div>Партнёров 4-го уровня <span class="tip" data-tip="Открывается при депозите ≥ $20,000.">i</span></div><input type="number" id="affL4" value="0" min="0"/></label>
+
+      <label style="display:flex;gap:8px;align-items:center;margin-top:6px">
+        <input type="checkbox" id="calcAvgFromDep" checked/> Считать среднюю прибыль партнёра от его депозита и месячной ставки
+      </label>
+      <div id="avgBlock">
+        <div class="row three">
+          <label><div>Депозит A (мин.)</div><input type="number" id="depA" value="3000" min="3000"/></label>
+          <label><div>Депозит B</div><input type="number" id="depB" value="10000" min="3000"/></label>
+          <label><div>Депозит C</div><input type="number" id="depC" value="20000" min="3000"/></label>
+        </div>
+        <div class="row three">
+          <label><div>Доля A, %</div><input type="number" id="wA" value="40" min="0" max="100"/></label>
+          <label><div>Доля B, %</div><input type="number" id="wB" value="40" min="0" max="100"/></label>
+          <label><div>Доля C, %</div><input type="number" id="wC" value="20" min="0" max="100"/></label>
+        </div>
+        <div class="kpiAff" style="grid-template-columns:1fr">
+          <div class="mini"><div class="label">Средняя прибыль партнёра/мес (расчётная)</div><div class="val" id="affAvgCalc">—</div></div>
+        </div>
       </div>
+
+      <div class="lvlKPI">
+        <div class="box"><div class="label">L1 / мес (5%)</div><div class="val" id="l1m">—</div></div>
+        <div class="box"><div class="label">L2 / мес (8%)</div><div class="val" id="l2m">—</div></div>
+        <div class="box"><div class="label">L3 / мес (10%)</div><div class="val" id="l3m">—</div></div>
+        <div class="box"><div class="label">L4 / мес (2%)</div><div class="val" id="l4m">—</div></div>
+      </div>
+
       <div class="kpiAff">
-        <div class="mini"><div class="label">Собственный доход (50% прибыли)</div><div class="val" id="ownShare">—</div><div class="hint">Работает при депозите ≥ $3,000</div></div>
+        <div class="mini"><div class="label">Собственный доход (моя доля прибыли)</div><div class="val" id="ownShare">—</div><div class="hint" id="ownShareHint">—</div></div>
         <div class="mini"><div class="label">Партнёрский доход за период</div><div class="val" id="affTotal">—</div><div class="hint" id="affLevelsHint">Уровни: —</div></div>
         <div class="mini"><div class="label">Итого: собственный + партнёрский</div><div class="val" id="grandTotal">—</div><div class="hint" id="affPerMonth">В среднем в месяц: —</div></div>
       </div>
+
+      <div class="row two">
+        <label><div>Моя доля от прибыли депозита</div>
+          <select id="ownSharePct">
+            <option value="50">50% (депозит ≥ $3k)</option>
+            <option value="60">60% (депозит ≥ $10k)</option>
+            <option value="70">70% (депозит ≥ $20k)</option>
+          </select>
+        </label>
+        <div class="hint" id="ownShareLock">Недоступные варианты автоматически станут активны при достижении порога депозита.</div>
+      </div>
+      <div class="hint">Доля партнёрки = <b id="partnerShareText">50%</b>. Сумма долей всегда 100%.</div>
     </div>
   </div>
 
-  <div class="card help" id="help" style="margin-top:16px">
-    <div class="ctitle"><h3>Пошаговая инструкция</h3><span class="pill">Даже ребёнку понятно</span></div>
-    <ol>
-      <li><b>Выберите способ ставки</b>: «годовая» или «месячная».</li>
-      <li><b>Введите сумму на старте</b> и <b>регулярные пополнения</b>.</li>
-      <li><b>Капитализация</b>: как часто начисляются проценты (месяц/квартал/год).</li>
-      <li><b>Комиссия/Инфляция</b>: по желанию, чтобы видеть реальную покупательную способность.</li>
-      <li><b>Годы и момент пополнения</b>: начало выгоднее конца.</li>
-      <li>График и таблица обновляются автоматически.</li>
-      <li><b>Цель</b>: задайте сумму и год → «Рассчитать нужное пополнение».</li>
-      <li><b>Сценарии</b>: включите тумблер — три линии (пессимистичный/база/оптимистичный).</li>
-      <li><b>Сохранение</b>: параметры можно шарить — URL обновляется, также сохраняем в браузере.</li>
-      <li>Экспорт: <b>PNG</b>/<b>PDF</b>/<b>CSV</b> кнопками вверху (и в нижней панели на мобайле).</li>
-      <li><b>Партнёрка</b>: включите модуль, задайте число партнёров по уровням и среднюю прибыль одного участника в месяц. Уровни открываются от депозита: ≥$3k (1–2), ≥$10k (3), ≥$20k (4). Итог = 50% вашей прибыли + % от прибыли сети.</li>
-    </ol>
-  </div>
-
-</div>
-
-<div class="actionBar">
-  <button class="btn ghost" id="abReset">Сброс</button>
-  <button class="btn" id="abShare">Share</button>
-  <button class="btn" id="abPNG">PNG</button>
-  <button class="btn" id="abPDF">PDF</button>
-  <button class="btn" id="abCSV">CSV</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script>
-const $ = (s)=>document.querySelector(s);
-const i = (id)=>document.getElementById(id);
-function lcm(a,b){const g=(x,y)=>y===0?x:g(y,x%y);return a*b/g(a,b)}
-function fmt(sym,n){return `${sym} ${(+n).toLocaleString(undefined,{maximumFractionDigits:2})}`;}
-function clamp(x,minv,maxv){return Math.max(minv, Math.min(maxv, x));}
-function toPct(x,dec=2){return (x*100).toFixed(dec)+'%';}
-function num(v){return +v||0;}
-function monthlyToAnnualEAR(m){return Math.pow(1+m,12)-1;}
-function expectedAnnualWithVol(m, d){
-  const a = clamp(m-d, -0.99, 10), b = clamp(m+d, -0.99, 10);
-  const N = 720; let sumLog = 0;
-  for(let k=0;k<N;k++){ const x = a + (b-a)*(k+0.5)/N; sumLog += Math.log(1+x); }
-  const meanLogMonth = sumLog / N; return Math.exp(12 * meanLogMonth) - 1;
-}
-function simulate(params){
-  const {initial,contrib,contribFreq,rate,fee,infl,compound,years,timing} = params;
-  const n = Math.max(1, Math.floor(compound));
-  const m = Math.max(0, Math.floor(contribFreq));
-  const steps = (m===0? n : lcm(n,m));
-  const compoundEvery = steps/n;
-  const contribEvery = (m===0? Infinity : steps/m);
-  const rNet = (rate - fee)/100;
-  let bal = +initial||0, totalC=0, invested = +initial||0;
-  const yearly=[], investedYearly=[];
-  for(let y=1; y<=years; y++){
+const gi = (id)=>document.getElementById(id);
+const fmt = (sym,n)=>`${sym} ${(+n).toLocaleString(undefined,{maximumFractionDigits:2})}`;
+const lcm=(a,b)=>{const g=(x,y)=>y===0?x:g(y,x%y);return a*b/g(a,b)};
+function simulate({initial,contrib,contribFreq,rate,fee,infl,compound,years,timing='end',currency:'$'}){
+  const n=Math.max(1,Math.floor(compound||1));const m=Math.max(0,Math.floor(contribFreq||0));
+  const steps=(m===0? n : lcm(n,m)), compEvery=steps/n, contEvery=(m===0? Infinity : steps/m);
+  const rNet=(rate - (fee||0))/100; let bal=+initial||0, totalC=0, invested=+initial||0; const yearly=[], investedYearly=[];
+  for(let y=1;y<=years;y++){
     for(let s=1;s<=steps;s++){
-      if(timing==='begin' && ((s-1)%contribEvery===0) && params.contrib>0){ bal+=+params.contrib; totalC+=+params.contrib; invested+=+params.contrib; }
-      if(s%compoundEvery===0){ bal *= 1 + (rNet/n); }
-      if(timing==='end' && (s%contribEvery===0) && params.contrib>0){ bal+=+params.contrib; totalC+=+params.contrib; invested+=+params.contrib; }
+      if(timing==='begin' && ((s-1)%contEvery===0) && contrib>0){bal+=+contrib; totalC+=+contrib; invested+=+contrib;}
+      if(s%compEvery===0){ bal*=1+(rNet/n);}
+      if(timing==='end' && (s%contEvery===0) && contrib>0){bal+=+contrib; totalC+=+contrib; invested+=+contrib;}
     }
-    const real = params.infl ? bal / Math.pow(1+params.infl/100, y) : bal;
-    yearly.push({year:y, balance:bal, real});
-    investedYearly.push(invested);
+    const real=infl? bal/Math.pow(1+infl/100,y):bal; yearly.push({year:y,balance:bal,real}); investedYearly.push(invested);
   }
-  const ear = Math.pow(1 + (rNet/n), n) - 1;
-  return {final:bal,totalC,interest:bal-(+initial+totalC),yearly,investedYearly,ear};
+  const ear=Math.pow(1+(rNet/n),n)-1; return {final:bal,totalC,interest:bal-(+initial+totalC),yearly,investedYearly,ear};
 }
-function solveContribution(target, year, baseParams){
-  let low = 0, high = (target || 1);
-  function val(c){ const r = simulate({...baseParams, contrib:c}); const y = r.yearly[Math.min(year-1, r.yearly.length-1)]; return y ? y.balance : r.final; }
-  while(val(high) < target) high *= 2;
-  for(let k=0;k<60;k++){ const mid=(low+high)/2; if(val(mid) >= target) high=mid; else low=mid; }
-  return high;
-}
-const DEFAULTS = {mode:'annual',useAvgEar:false,initial:400000,currency:'₽',contrib:10000,contribFreq:12,rate:5,compound:12,mrate:2.0,mvol:3.0,fee:0,infl:0,timing:'end',years:4,scenarioOn:false,scenarioDelta:3,goalAmount:1000000,goalYear:4,senseRate:0,senseContrib:0,affOn:true,affAvg:200,affMonths:48,affL1:5,affL2:10,affL3:0,affL4:0};
-function getParamsFromInputs(){return {mode:i('modeMonthly').checked?'monthly':'annual',useAvgEar:i('useAvgEar').checked,initial:+i('initial').value||0,currency:i('currency').value,contrib:+i('contrib').value||0,contribFreq:+i('contribFreq').value||0,rate:+i('rate').value||0,compound:+i('compound').value||0,mrate:+i('mrate').value||0,mvol:+i('mvol').value||0,fee:+i('fee').value||0,infl:+i('infl').value||0,timing:i('timing').value,years:+i('years').value||0,scenarioOn:i('scenarioOn').checked,scenarioDelta:+i('scenarioDelta').value||0,goalAmount:+i('goalAmount').value||0,goalYear:+i('goalYear').value||0,senseRate:+i('senseRate').value||0,senseContrib:+i('senseContrib').value||0,affOn:i('affOn').checked,affAvg:+i('affAvg').value||0,affMonths:+i('affMonths').value||0,affL1:+i('affL1').value||0,affL2:+i('affL2').value||0,affL3:+i('affL3').value||0,affL4:+i('affL4').value||0};}
-function applyParams(p){(p.mode==='monthly'? i('modeMonthly'):i('modeAnnual')).checked = true; i('useAvgEar').checked=!!p.useAvgEar; i('initial').value=p.initial; i('currency').value=p.currency; i('contrib').value=p.contrib; i('contribFreq').value=p.contribFreq; i('rate').value=p.rate; i('compound').value=p.compound; i('mrate').value=p.mrate; i('mvol').value=p.mvol; i('fee').value=p.fee; i('infl').value=p.infl; i('timing').value=p.timing; i('years').value=p.years; i('scenarioOn').checked=!!p.scenarioOn; i('scenarioDelta').value=p.scenarioDelta; i('goalAmount').value=p.goalAmount; i('goalYear').value=p.goalYear; i('senseRate').value=p.senseRate; i('senseContrib').value=p.senseContrib; i('affOn').checked=!!p.affOn; i('affAvg').value=p.affAvg; i('affMonths').value=p.affMonths; i('affL1').value=p.affL1; i('affL2').value=p.affL2; i('affL3').value=p.affL3; i('affL4').value=p.affL4; setMode(p.mode); updateSenseLabels();}
-function saveState(){const p=getParamsFromInputs(); const url=new URL(location.href); const sp=url.searchParams; Object.entries(p).forEach(([k,v])=> sp.set(k, v)); history.replaceState(null,'',url.toString()); try{ localStorage.setItem('zeus_calc_state_v5', JSON.stringify(p)); }catch(e){} }
-function restoreState(){const url=new URL(location.href); const sp=url.searchParams; let state={...DEFAULTS}; if(sp && sp.keys().next().value){ sp.forEach((v,k)=>{ if(['mode','currency','timing'].includes(k)) state[k]=v; else if(['scenarioOn','useAvgEar','affOn'].includes(k)) state[k]=(v==='true'||v===true||v==='1'); else state[k]=+v;}); } else { try{ const raw=localStorage.getItem('zeus_calc_state_v5'); if(raw) state={...state, ...JSON.parse(raw)} }catch(e){} } applyParams(state);}
-function setMode(mode){ if(mode==='monthly'){ i('monthlyInputs').style.display='grid'; i('monthlyKPI').style.display='grid'; i('rate').setAttribute('disabled','disabled'); } else { i('monthlyInputs').style.display='none'; i('monthlyKPI').style.display='none'; i('rate').removeAttribute('disabled'); } }
-function updateSenseLabels(){ i('senseRateVal').textContent=(+i('senseRate').value||0).toFixed(2)+'%'; i('senseContribVal').textContent=(+i('senseContrib').value||0).toFixed(0)+'%'; }
-let chart;
-const goalLinePlugin={id:'goalLine',afterDatasetsDraw(chart,args,pluginOptions){const {ctx,scales:{x,y}}=chart; const gy=+i('goalYear').value||1; const labels=chart.data.labels||[]; const idx=Math.min(Math.max(gy-1,0),labels.length-1); const xPos=x.getPixelForValue(labels[idx]); ctx.save(); ctx.strokeStyle='rgba(56,232,255,.5)'; ctx.setLineDash([6,6]); ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(xPos,y.top); ctx.lineTo(xPos,y.bottom); ctx.stroke(); const txt='Цель: год '+gy; ctx.fillStyle='#9fb7ff'; ctx.setLineDash([]); ctx.font='12px Inter, system-ui, sans-serif'; ctx.fillText(txt, xPos+6, y.top+16); ctx.restore();}};
-function render(){
-  const mode=i('modeMonthly').checked?'monthly':'annual';
-  if(mode==='monthly'){
-    const m=(+i('mrate').value||0)/100; const d=Math.max(0,(+i('mvol').value||0)/100);
-    const ear=Math.pow(1+m,12)-1; const lo=Math.pow(1+clamp(m-d,-0.99,10),12)-1; const hi=Math.pow(1+clamp(m+d,-0.99,10),12)-1; const avg=expectedAnnualWithVol(m,d);
-    i('earFromMonthly').textContent=(ear*100).toFixed(2)+'%'; i('earRange').textContent=(lo*100).toFixed(1)+'% … '+(hi*100).toFixed(1)+'%'; i('earAvg').textContent=(avg*100).toFixed(2)+'%';
-    const effective=i('useAvgEar').checked?avg:ear; i('rate').value=(effective*100).toFixed(4);
-  }
-  let params={ initial:+i('initial').value||0, contrib:+i('contrib').value||0, contribFreq:+i('contribFreq').value||0, rate:(+i('rate').value||0) + (+i('senseRate').value||0), fee:+i('fee').value||0, infl:+i('infl').value||0, compound:+i('compound').value||0, years:+i('years').value||0, currency:i('currency').value, timing:i('timing').value };
-  params.contrib = params.contrib * (1 + (+i('senseContrib').value||0)/100);
-  const r = simulate(params);
-  i('final').textContent = fmt(params.currency, r.final);
-  i('tcontrib').textContent = fmt(params.currency, r.totalC);
-  i('tinterest').textContent = fmt(params.currency, r.interest);
-  i('earVal').textContent = (r.ear*100).toFixed(2) + '%';
-  const tb=i('tbody'); tb.innerHTML=''; r.yearly.forEach(y=>{const tr=document.createElement('tr'); tr.innerHTML=`<td>${y.year}</td><td>${fmt(params.currency,y.balance)}</td><td>${fmt(params.currency,y.real)}</td>`; tb.appendChild(tr);});
-  const gy=Math.min(Math.max(+i('goalYear').value||1,1), r.yearly.length); const target=+i('goalAmount').value||0; const balAtGoal=r.yearly[gy-1]?.balance||r.final; const diff=balAtGoal-target; const sign=diff>=0?'перевыполнение':'не хватает'; i('goalDeltaText').textContent=`К ${gy}-му году ${sign} ${fmt(params.currency, Math.abs(diff))}. Итог: ${fmt(params.currency, balAtGoal)} против цели ${fmt(params.currency, target)}.`;
-  const ctx=document.getElementById('chart').getContext('2d'); if(chart) chart.destroy();
-  const labels=r.yearly.map(y=>y.year);
-  const datasetsBase=[
-    {label:'Внесено', data:r.investedYearly, borderColor:'#ff8a2a', backgroundColor:'rgba(255,138,42,.18)', fill:true, tension:.25},
-    {label:'Итог', data:r.yearly.map(y=>y.balance), borderColor:'#38e8ff', backgroundColor:'rgba(56,232,255,.15)', tension:.25, fill:false},
-    {label:'Цель', data:labels.map(()=> target), borderColor:'#9cff70', borderDash:[6,6], pointRadius:0, tension:0, fill:false},
-  ];
-  if(i('scenarioOn').checked){
-    const delta=Math.max(0, +i('scenarioDelta').value||0);
-    const pess=simulate({...params, rate: params.rate - delta}); const opt=simulate({...params, rate: params.rate + delta});
-    chart=new Chart(ctx,{type:'line', data:{labels, datasets:[
-      {label:'Пессимистичный', data:pess.yearly.map(y=>y.balance), borderColor:'#ff5bbd', backgroundColor:'transparent', tension:.25},
-      {label:'Базовый', data:r.yearly.map(y=>y.balance), borderColor:'#38e8ff', backgroundColor:'transparent', tension:.25},
-      {label:'Оптимистичный', data:opt.yearly.map(y=>y.balance), borderColor:'#9cff70', backgroundColor:'transparent', tension:.25},
-      {label:'Цель', data:labels.map(()=> target), borderColor:'#9cff70', borderDash:[6,6], pointRadius:0, tension:0, fill:false}
-    ]}, options:{plugins:{legend:{labels:{color:'#d7eaff'}}}, scales:{x:{ticks:{color:'#9fb7ff'}}, y:{ticks:{color:'#9fb7ff'}}}}, plugins:[{id:'goalLine', afterDatasetsDraw:goalLinePlugin.afterDatasetsDraw}]});
-  } else {
-    const ds=[datasetsBase[0], {...datasetsBase[1], fill:{ target:2 }}, datasetsBase[2] ];
-    chart=new Chart(ctx,{type:'line', data:{labels, datasets:ds}, options:{plugins:{legend:{labels:{color:'#d7eaff'}}}, scales:{x:{ticks:{color:'#9fb7ff'}}, y:{ticks:{color:'#9fb7ff'}}}}, plugins:[{id:'goalLine', afterDatasetsDraw:goalLinePlugin.afterDatasetsDraw}]});
-  }
+function annualToMonthly(r){return Math.pow(1+r/100,1/12)-1}
+function monthlyToAnnual(m){return (Math.pow(1+m,12)-1)*100}
+function clamp(x,min,max){return Math.min(max,Math.max(min,x))}
 
-  // ---- Affiliate / Partner program ----
-  const p = getParamsFromInputs();
-  const dep = +i('initial').value || 0;
-  const lvl1Open = dep >= 3000, lvl2Open = dep >= 3000, lvl3Open = dep >= 10000, lvl4Open = dep >= 20000;
-  const months = (p.affMonths>0? p.affMonths : (num(i('years').value)||0)*12);
-  const avg = Math.max(0, p.affAvg);
-  const l1 = (lvl1Open ? p.affL1 : 0), l2 = (lvl2Open ? p.affL2 : 0), l3 = (lvl3Open ? p.affL3 : 0), l4 = (lvl4Open ? p.affL4 : 0);
-  const affIncome = p.affOn ? months * avg * (0.05*l1 + 0.08*l2 + 0.10*l3 + 0.02*l4) : 0;
-  const ownIncome = (dep >= 3000) ? Math.max(0, r.interest*0.5) : 0;
-  const grand = ownIncome + affIncome;
-  if(i('ownShare')) i('ownShare').textContent = fmt(params.currency, ownIncome);
-  if(i('affTotal')) i('affTotal').textContent = fmt(params.currency, affIncome);
-  if(i('grandTotal')) i('grandTotal').textContent = fmt(params.currency, grand);
-  const levelsTxt = `1:${l1}${lvl1Open?'✓':'✕'} · 2:${l2}${lvl2Open?'✓':'✕'} · 3:${l3}${lvl3Open?'✓':'✕'} · 4:${l4}${lvl4Open?'✓':'✕'}`;
-  if(i('affLevelsHint')) i('affLevelsHint').textContent = 'Уровни: ' + levelsTxt;
-  if(i('affPerMonth')) i('affPerMonth').textContent = 'В месяц: ' + fmt(params.currency, (grand / Math.max(1, months)));
+let chart; let lastEdit='annual';
+['rate','mrate'].forEach(id=> gi(id).addEventListener('input', e=>{ lastEdit=(id==='mrate'?'monthly':'annual'); render(); }));
+['initial','contrib','contribFreq','fee','infl','compound','years','currency','scenPct','scenOn','vol','timing',
+ 'affMonths','affL1','affL2','affL3','affL4','calcAvgFromDep','depA','depB','depC','wA','wB','wC','ownSharePct','useAvg',
+ 'sensRate','sensContrib']
+  .forEach(id=> gi(id).addEventListener('input', render));
 
-  saveState();
-}
-['initial','contrib','contribFreq','rate','fee','infl','compound','years','currency','timing','scenarioOn','scenarioDelta','mrate','mvol','useAvgEar','goalAmount','goalYear','senseRate','senseContrib','affOn','affAvg','affMonths','affL1','affL2','affL3','affL4']
-  .forEach(id=> document.getElementById(id) && document.getElementById(id).addEventListener('input', ()=>{ 
-    document.getElementById('senseRateVal').textContent=(+i('senseRate').value||0).toFixed(2)+'%';
-    document.getElementById('senseContribVal').textContent=(+i('senseContrib').value||0).toFixed(0)+'%';
-    render(); 
-  }));
-document.getElementById('modeAnnual').addEventListener('change', e=> { document.getElementById('monthlyInputs').style.display='none'; document.getElementById('monthlyKPI').style.display='none'; i('rate').removeAttribute('disabled'); render(); });
-document.getElementById('modeMonthly').addEventListener('change', e=> { document.getElementById('monthlyInputs').style.display='grid'; document.getElementById('monthlyKPI').style.display='grid'; i('rate').setAttribute('disabled','disabled'); render(); });
-document.addEventListener('click', (e)=>{ document.querySelectorAll('.tip.open').forEach(t=> t.classList.remove('open')); });
-document.querySelectorAll('.tip').forEach(t=>{ t.addEventListener('click', (e)=>{ t.classList.toggle('open'); e.stopPropagation(); }); });
-async function shareLink(){ const url=location.href; try{ await navigator.clipboard.writeText(url); alert('Ссылка скопирована!'); }catch(e){ prompt('Скопируйте ссылку:', url); } }
-async function exportPNG(){ const node=document.querySelector('.wrap'); const canvas=await html2canvas(node,{backgroundColor:'#0b1330',scale:2}); const link=document.createElement('a'); link.download='zeus-ai-calculator.png'; link.href=canvas.toDataURL(); link.click(); }
-async function exportPDF(){ const node=document.querySelector('.wrap'); const canvas=await html2canvas(node,{backgroundColor:'#0b1330',scale:2}); const imgData=canvas.toDataURL('image/png'); const { jsPDF } = window.jspdf; const pdf=new jsPDF('p','pt','a4'); const w=pdf.internal.pageSize.getWidth(); const h=canvas.height*(w/canvas.width); pdf.addImage(imgData,'PNG',0,0,w,h); pdf.save('zeus-ai-calculator.pdf'); }
-function exportCSV(){ const params={ initial:+i('initial').value||0, contrib:+i('contrib').value||0, contribFreq:+i('contribFreq').value||0, rate:+i('rate').value||0, fee:+i('fee').value||0, infl:+i('infl').value||0, compound:+i('compound').value||0, years:+i('years').value||0, currency:i('currency').value, timing:i('timing').value }; const r=simulate(params); let csv='Year,Balance,Real\n'; r.yearly.forEach(y=> csv+=`${y.year},${y.balance},${y.real}\n` ); const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='zeus-ai-table.csv'; a.click(); }
-document.getElementById('helpBtn').addEventListener('click', ()=>{ const el=document.getElementById('help'); if(el) el.scrollIntoView({behavior:'smooth'}); });
-document.getElementById('shareBtn').addEventListener('click', shareLink);
-document.getElementById('pngBtn').addEventListener('click', exportPNG);
-document.getElementById('pdfBtn').addEventListener('click', exportPDF);
-document.getElementById('csvBtn').addEventListener('click', exportCSV);
-document.getElementById('resetBtn').addEventListener('click', ()=>{ applyParams(DEFAULTS); render(); });
-document.getElementById('abShare').addEventListener('click', shareLink);
-document.getElementById('abPNG').addEventListener('click', exportPNG);
-document.getElementById('abPDF').addEventListener('click', exportPDF);
-document.getElementById('abCSV').addEventListener('click', exportCSV);
-document.getElementById('abReset').addEventListener('click', ()=>{ applyParams(DEFAULTS); render(); });
-document.getElementById('solveGoal').addEventListener('click', ()=>{
-  let p={ mode:i('modeMonthly').checked?'monthly':'annual', useAvgEar:i('useAvgEar').checked, initial:+i('initial').value||0, currency:i('currency').value, contrib:+i('contrib').value||0, contribFreq:+i('contribFreq').value||0, rate:+i('rate').value||0, compound:+i('compound').value||0, mrate:+i('mrate').value||0, mvol:+i('mvol').value||0, fee:+i('fee').value||0, infl:+i('infl').value||0, timing:i('timing').value, years:+i('years').value||0, scenarioOn:i('scenarioOn').checked, scenarioDelta:+i('scenarioDelta').value||0, goalAmount:+i('goalAmount').value||0, goalYear:+i('goalYear').value||0, senseRate:+i('senseRate').value||0, senseContrib:+i('senseContrib').value||0 };
-  if(p.contribFreq===0){ p.contribFreq=12; i('contribFreq').value=12; }
-  const baseParams = { initial:p.initial, contrib:p.contrib, contribFreq:p.contribFreq, rate:p.rate + p.senseRate, fee:p.fee, infl:p.infl, compound:p.compound, years:p.years, currency:p.currency, timing:p.timing };
-  const need = solveContribution(p.goalAmount, p.goalYear, baseParams);
-  i('contrib').value = Math.round(need*100)/100; render();
-  i('goalHint').textContent = 'Чтобы к '+p.goalYear+' году получить ~'+fmt(p.currency,p.goalAmount)+', внесение ≈ '+fmt(p.currency, i('contrib').value)+' за период.';
+document.addEventListener('click', (e)=>{
+  if(e.target.classList.contains('tip')) e.target.classList.toggle('open');
+  else document.querySelectorAll('.tip.open').forEach(t=>t.classList.remove('open'));
 });
-applyParams(DEFAULTS); restoreState(); render();
+
+function render(){
+  // two-way sync of rates
+  if(lastEdit==='annual'){ gi('mrate').value = (annualToMonthly(+gi('rate').value||0)*100).toFixed(4); }
+  else { gi('rate').value = monthlyToAnnual((+gi('mrate').value||0)/100).toFixed(4); }
+
+  const m = (+gi('mrate').value||0)/100;
+  const delta = (+(gi('vol').value)||0)/100;
+  const ear = monthlyToAnnual(m);
+  const lo = monthlyToAnnual(clamp(m-delta,-0.99,10));
+  const hi = monthlyToAnnual(m+delta);
+  const geoMonth = Math.cbrt( (1+clamp(m-delta,-0.99,10))*(1+m)*(1+(m+delta)) ) - 1;
+  const geoYear = monthlyToAnnual(geoMonth);
+  gi('kpiEar').textContent = ear.toFixed(2)+'%';
+  gi('kpiRange').textContent = `${lo.toFixed(1)}% … ${hi.toFixed(1)}%`;
+  gi('kpiGeo').textContent = geoYear.toFixed(2)+'%';
+  const useAvg = gi('useAvg').checked;
+  const rateForSim = useAvg? geoYear : ear;
+  gi('earVal').textContent = rateForSim.toFixed(2)+'%';
+
+  // sensitivity (visual)
+  const sensRate = (+gi('sensRate').value||0)/100;
+  const sensContrib = (+gi('sensContrib').value||0);
+  const mAdj = Math.max(-0.99, m*(1+sensRate));
+  const earAdj = monthlyToAnnual(mAdj);
+
+  const params = {
+    initial:+gi('initial').value||0, contrib:(+gi('contrib').value||0)+sensContrib, contribFreq:+gi('contribFreq').value||0,
+    rate:earAdj, fee:+gi('fee').value||0, infl:+gi('infl').value||0, compound:+gi('compound').value||0,
+    years:+gi('years').value||0, currency:gi('currency').value, timing:gi('timing').value
+  };
+  const base = simulate(params);
+
+  gi('final').textContent=fmt(params.currency,base.final);
+  gi('tcontrib').textContent=fmt(params.currency,base.totalC);
+  gi('tinterest').textContent=fmt(params.currency,base.interest);
+
+  // scenarios lines around base monthly m
+  const scenOn = gi('scenOn').checked;
+  const scen = (+gi('scenPct').value||0)/100;
+  let pess=base,opt=base;
+  if(scenOn){
+    const pM = Math.max(-0.99, m*(1-scen));
+    const oM = Math.max(-0.99, m*(1+scen));
+    pess = simulate({...params, rate: monthlyToAnnual(pM)});
+    opt  = simulate({...params, rate: monthlyToAnnual(oM)});
+  }
+  const labels=base.yearly.map(y=>y.year);
+  const ctx=document.getElementById('chart').getContext('2d'); if(chart) chart.destroy();
+  chart=new Chart(ctx,{type:'line',data:{labels,datasets:[
+    {label:'Внесено',data:base.investedYearly,borderColor:'#ff8a2a',backgroundColor:'rgba(255,138,42,.18)',fill:true,tension:.25},
+    scenOn?{label:'Пессимистичный',data:pess.yearly.map(y=>y.balance),borderColor:'#ff5bbd',backgroundColor:'transparent',tension:.25,borderDash:[6,6]}:null,
+    {label:'Итог (база)',data:base.yearly.map(y=>y.balance),borderColor:'#38e8ff',backgroundColor:'transparent',tension:.25},
+    scenOn?{label:'Оптимистичный',data:opt.yearly.map(y=>y.balance),borderColor:'#9cff70',backgroundColor:'transparent',tension:.25,borderDash:[6,6]}:null
+  ].filter(Boolean)},options:{plugins:{legend:{labels:{color:'#d7eaff'}}},scales:{x:{ticks:{color:'#9fb7ff'}},y:{ticks:{color:'#9fb7ff'}}}}});
+
+  gi('tbody').innerHTML = base.yearly.map(y=> `<tr><td>${y.year}</td><td>${fmt(params.currency,y.balance)}</td><td>${fmt(params.currency,y.real)}</td></tr>`).join('');
+
+  // Affiliate calculations
+  const months = +gi('affMonths').value || (params.years*12);
+  const dep = params.initial;
+  const opt50 = dep>=3000, opt60=dep>=10000, opt70=dep>=20000;
+  Array.from(gi('ownSharePct').options).forEach(o=>{
+    const v=+o.value; o.disabled=(v===50 && !opt50) || (v===60 && !opt60) || (v===70 && !opt70);
+  });
+  let selected = +gi('ownSharePct').value;
+  if((selected===70 && !opt70) || (selected===60 && !opt60) || (selected===50 && !opt50)){
+    selected = opt70?70:(opt60?60:(opt50?50:0));
+    gi('ownSharePct').value = selected || 50;
+  }
+  const partnerShare = 100 - (selected||0);
+  gi('partnerShareText').textContent = partnerShare + '%';
+  gi('ownShareHint').textContent = selected?`Вы берёте ${selected}% от своей прибыли за период.`:'Недоступно при депозите < $3k';
+  gi('ownShareLock').textContent = selected?`Доступно по порогу: выбрана доля ${selected}%`:`Депозит ниже $3k — доля не активна.`;
+  const ownShare = (selected||0)/100;
+
+  // Средняя прибыль партнёра/мес от их депозита и вашей месячной ставки m
+  let avgMonthProfit = 0;
+  if(gi('calcAvgFromDep').checked){
+    const dA=+gi('depA').value||3000, dB=+gi('depB').value||10000, dC=+gi('depC').value||20000;
+    let wA=+gi('wA').value||0, wB=+gi('wB').value||0, wC=+gi('wC').value||0;
+    const total=(wA+wB+wC)||1; wA/=total; wB/=total; wC/=total;
+    avgMonthProfit = dA*wA*m + dB*wB*m + dC*wC*m;
+    gi('affAvgCalc').textContent = fmt(params.currency, avgMonthProfit);
+  } else { avgMonthProfit = 200; gi('affAvgCalc').textContent = '—'; }
+
+  const L1=+gi('affL1').value||0, L2=+gi('affL2').value||0, L3=+gi('affL3').value||0, L4=+gi('affL4').value||0;
+  const l1ok = dep>=3000, l2ok=dep>=3000, l3ok=dep>=10000, l4ok=dep>=20000;
+  const l1m = l1ok ? avgMonthProfit*0.05*L1 : 0;
+  const l2m = l2ok ? avgMonthProfit*0.08*L2 : 0;
+  const l3m = l3ok ? avgMonthProfit*0.10*L3 : 0;
+  const l4m = l4ok ? avgMonthProfit*0.02*L4 : 0;
+  gi('l1m').textContent = fmt(params.currency,l1m);
+  gi('l2m').textContent = fmt(params.currency,l2m);
+  gi('l3m').textContent = fmt(params.currency,l3m);
+  gi('l4m').textContent = fmt(params.currency,l4m);
+  gi('affLevelsHint').textContent = `Уровни активны: ${l1ok?'1':''}${l2ok?',2':''}${l3ok?',3':''}${l4ok?',4':''}`.replace(/^,|,,/g,'');
+  const affTotal = (l1m+l2m+l3m+l4m) * months;
+
+  const ownIncome = ownShare * Math.max(0, base.interest);
+  gi('ownShare').textContent = fmt(params.currency, ownIncome);
+
+  const grand = ownIncome + affTotal;
+  gi('affTotal').textContent = fmt(params.currency, affTotal);
+  gi('grandTotal').textContent = fmt(params.currency, grand);
+  gi('affPerMonth').textContent = `В среднем в месяц: ${fmt(params.currency, grand/Math.max(1,months))}`;
+}
+render();
 </script>
 </body>
 </html>
