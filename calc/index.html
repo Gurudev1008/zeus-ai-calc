@@ -6,7 +6,7 @@
 <title>ZEUS AI • Калькулятор сложных процентов</title>
 <link rel="icon" href="../assets/favicon.svg"/>
 <style>
-:root{--bg:#0b1330;--panel:#0f1d3f;--text:#d7eaff;--cyan:#38e8ff;--orange:#ff8a2a;--lime:#9cff70}
+:root{--bg:#0b1330;--panel:#0f1d3f;--text:#d7eaff;--cyan:#38e8ff;--orange:#ff8a2a;--lime:#9cff70;--tipbg:#0c1a3a}
 *{box-sizing:border-box}
 body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto;color:var(--text);background:radial-gradient(1200px 600px at 10% 0%,#13214a 0%,#0b1330 55%,#081027 100%)}
 .wrap{max-width:1120px;margin:24px auto;padding:0 16px}
@@ -32,7 +32,14 @@ input,select{background:rgba(255,255,255,.02);border:1px solid #38e8ff30;color:v
 .btn{background:linear-gradient(90deg,#1b2f73,#103a5f);color:#fff;border:1px solid #38e8ff55;padding:10px 14px;border-radius:12px;cursor:pointer}
 .btn:hover{box-shadow:0 0 12px #38e8ff55}
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-left:auto}
-.tip{display:inline-block;margin-left:6px;padding:0 6px;border:1px solid #38e8ff55;border-radius:999px;font-weight:700;cursor:help}
+
+/* Neon tooltips */
+.tip{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;line-height:18px;background:#112552;border:1px solid #38e8ff80;border-radius:50%;font-size:11px;font-weight:700;color:#9bdfff;cursor:help;position:relative;margin-left:6px}
+.tip::after{content:attr(data-tip);position:absolute;bottom:130%;left:50%;transform:translateX(-50%) scale(.95);opacity:0;pointer-events:none;background:var(--tipbg);color:#d7eaff;border:1px solid #38e8ff80;border-radius:10px;padding:10px 12px;min-width:220px;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 20px #38e8ff33;transition:.15s ease;z-index:50}
+.tip::before{content:"";position:absolute;bottom:120%;left:50%;transform:translateX(-50%);border:8px solid transparent;border-top-color:var(--tipbg);opacity:0;transition:.15s ease;z-index:49}
+.tip:hover::after,.tip:hover::before,.tip:focus-visible::after,.tip:focus-visible::before,.tip.open::after,.tip.open::before{opacity:1;transform:translateX(-50%) scale(1)}
+@media (hover:none){.tip{cursor:pointer}}
+
 .legend{opacity:.9;font-size:12px;margin-top:6px}
 .help li{margin:6px 0}
 @media (max-width:860px){.grid{grid-template-columns:1fr}}
@@ -59,60 +66,60 @@ input,select{background:rgba(255,255,255,.02);border:1px solid #38e8ff30;color:v
       <div class="fields">
         <div class="row split">
           <label>
-            <div>Первоначальная сумма <span class="tip" title="Стартовые деньги. Сколько у вас уже есть для старта (можно 0).">i</span></div>
+            <div>Первоначальная сумма <span class="tip" data-tip="Стартовые деньги. Сколько у вас уже есть для старта (можно 0).">i</span></div>
             <input type="number" id="initial" value="400000" min="0"/>
           </label>
           <label>
-            <div>Валюта <span class="tip" title="Это просто знак перед суммой: ₽, $, €, ₿ и т.д.">i</span></div>
+            <div>Валюта <span class="tip" data-tip="Это только знак перед суммой: ₽, $, €, ₿ и т.д.">i</span></div>
             <select id="currency"><option>₽</option><option>$</option><option>€</option><option>Rp</option><option>₹</option><option>₿</option></select>
           </label>
         </div>
 
         <div class="row two">
           <label>
-            <div>Регулярное пополнение <span class="tip" title="Сколько вы будете добавлять каждый раз (можно 0).">i</span></div>
+            <div>Регулярное пополнение <span class="tip" data-tip="Сколько вы будете добавлять каждый раз (можно 0).">i</span></div>
             <input type="number" id="contrib" value="10000" min="0"/>
           </label>
           <label>
-            <div>Частота пополнений <span class="tip" title="Как часто пополняете: ежемесячно, ежеквартально или раз в год.">i</span></div>
+            <div>Частота пополнений <span class="tip" data-tip="Как часто пополняете: ежемесячно, ежеквартально или раз в год.">i</span></div>
             <select id="contribFreq"><option value="0">Нет</option><option value="12" selected>Ежемесячно (12)</option><option value="4">Ежеквартально (4)</option><option value="1">Ежегодно (1)</option></select>
           </label>
         </div>
 
         <div class="row two">
           <label>
-            <div>Годовая ставка, % <span class="tip" title="Сколько процентов в год ожидаете ДО вычета комиссий.">i</span></div>
+            <div>Годовая ставка, % <span class="tip" data-tip="Ожидаемая доходность в год ДО вычета комиссий.">i</span></div>
             <input type="number" id="rate" value="5" step="0.01"/>
           </label>
           <label>
-            <div>Капитализация <span class="tip" title="Как часто начисляются проценты: чем чаще, тем выше итог.">i</span></div>
+            <div>Капитализация <span class="tip" data-tip="Как часто начисляются проценты: чем чаще, тем выше итог.">i</span></div>
             <select id="compound"><option value="12" selected>Ежемесячно (12)</option><option value="4">Ежеквартально (4)</option><option value="1">Ежегодно (1)</option></select>
           </label>
         </div>
 
         <div class="row two">
           <label>
-            <div>Комиссия в год, % <span class="tip" title="Комиссия площадки/сервиса. Вычитается из доходности.">i</span></div>
+            <div>Комиссия в год, % <span class="tip" data-tip="Комиссия сервиса/биржи. Вычитается из доходности.">i</span></div>
             <input type="number" id="fee" value="0" step="0.01"/>
           </label>
           <label>
-            <div>Инфляция, % <span class="tip" title="Оцениваем реальную покупательную способность.">i</span></div>
+            <div>Инфляция, % <span class="tip" data-tip="Показываем сумму с учётом инфляции (реальная покупательная способность).">i</span></div>
             <input type="number" id="infl" value="0" step="0.01"/>
           </label>
         </div>
 
         <div class="row two">
           <label>
-            <div>Момент пополнения <span class="tip" title="Когда вносите деньги: в начале периода или в конце. В начале выгоднее.">i</span></div>
+            <div>Момент пополнения <span class="tip" data-tip="Когда вносите деньги: начало или конец периода. В начале выгоднее.">i</span></div>
             <select id="timing"><option value="end" selected>В конце периода</option><option value="begin">В начале периода</option></select>
           </label>
           <label>
-            <div>Годы <span class="tip" title="Сколько лет вы планируете копить.">i</span></div>
+            <div>Годы <span class="tip" data-tip="Сколько лет вы планируете копить.">i</span></div>
             <input type="number" id="years" value="4" min="1"/>
           </label>
         </div>
 
-        <div class="hint">Подсказка: установите пополнение = 0, чтобы увидеть <b>чистую капитализацию</b>.</div>
+        <div class="hint">Подсказка: поставьте пополнение = 0, чтобы увидеть <b>чистую капитализацию</b>.</div>
       </div>
     </div>
 
@@ -150,8 +157,8 @@ input,select{background:rgba(255,255,255,.02);border:1px solid #38e8ff30;color:v
     <div class="ctitle"><h3>Цель (Goal seek)</h3><span class="pill">Опционально</span></div>
     <div class="fields">
       <div class="row two">
-        <label><div>Хочу получить сумму к году <span class="tip" title="Сколько вы хотите иметь к указанному году.">i</span></div><input id="goalAmount" type="number" value="1000000" min="0"/></label>
-        <label><div>Номер года <span class="tip" title="К какому году прийти к цели (1..N).">i</span></div><input id="goalYear" type="number" value="4" min="1"/></label>
+        <label><div>Хочу получить сумму к году <span class="tip" data-tip="Сколько вы хотите иметь к указанному году.">i</span></div><input id="goalAmount" type="number" value="1000000" min="0"/></label>
+        <label><div>Номер года <span class="tip" data-tip="К какому году прийти к цели (1..N).">i</span></div><input id="goalYear" type="number" value="4" min="1"/></label>
       </div>
       <div class="row two">
         <button class="btn" id="solveGoal">Рассчитать нужное пополнение</button>
@@ -215,7 +222,7 @@ function simulate(params){
   return {final:bal,totalC,interest:bal-(+initial+totalC),yearly,investedYearly,ear};
 }
 
-// Goal seek (бинпоиск по взносу)
+// Goal seek
 function solveContribution(target, year, baseParams){
   let low = 0, high = target || 1;
   function val(c){
@@ -318,6 +325,14 @@ document.getElementById('solveGoal').addEventListener('click', ()=>{
   document.getElementById('goalHint').textContent = 'Чтобы к '+gy+' году получить ~'+fmt(params.currency,target)+', внесение ≈ '+fmt(params.currency, document.getElementById('contrib').value)+' за период.';
 });
 
+// Tooltips: click toggles on mobile, hover works by CSS
+document.addEventListener('click', (e)=>{
+  document.querySelectorAll('.tip.open').forEach(t=> t.classList.remove('open'));
+});
+document.querySelectorAll('.tip').forEach(t=>{
+  t.addEventListener('click', (e)=>{ t.classList.toggle('open'); e.stopPropagation(); });
+});
+
 // scroll to help
 document.getElementById('helpBtn').addEventListener('click', ()=>{
   const el = document.getElementById('help'); if(el) el.scrollIntoView({behavior:'smooth'});
@@ -345,8 +360,8 @@ function exportCSV(){
     compound:+document.getElementById('compound').value, years:+document.getElementById('years').value, currency:document.getElementById('currency').value, timing:document.getElementById('timing').value
   };
   const r = simulate(params);
-  let csv='Year,Balance,Real\n';
-  r.yearly.forEach(y=> csv+=`${y.year},${y.balance},${y.real}\n` );
+  let csv='Year,Balance,Real\\n';
+  r.yearly.forEach(y=> csv+=`${y.year},${y.balance},${y.real}\\n` );
   const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a');
   a.href=URL.createObjectURL(blob); a.download='zeus-ai-table.csv'; a.click();
 }
