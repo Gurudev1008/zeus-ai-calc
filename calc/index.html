@@ -63,6 +63,11 @@ input,select{background:rgba(255,255,255,.02);border:1px solid #38e8ff30;color:v
 .kpi .mini .val{font-weight:700}
 .actionBar{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);z-index:30;display:none;gap:8px;background:rgba(13,22,50,.75);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:14px;padding:8px 10px}
 @media (max-width:860px){.grid{grid-template-columns:1fr}.kpi{grid-template-columns:1fr}.actionBar{display:flex}}
+/* Affiliate */
+.affGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:860px){.affGrid{grid-template-columns:1fr 1fr}}
+.kpiAff{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+.kpiAff .mini{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:10px;display:grid;gap:6px}
 </style>
 </head>
 <body>
@@ -178,6 +183,29 @@ input,select{background:rgba(255,255,255,.02);border:1px solid #38e8ff30;color:v
     </div>
   </div>
 
+  <div class="card" style="margin-top:16px">
+    <div class="ctitle"><h3>Партнёрская программа (копитрейдинг)</h3><span class="pill">Доход от сети</span></div>
+    <div class="fields">
+      <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="affOn" checked/> Учитывать партнёрские вознаграждения</label>
+      <div class="hint">Ваш доход: <b>50% от собственной прибыли</b> (минимальный депозит — <b>$3,000</b>). Доход от участников: 1-й уровень — <b>5%</b>, 2-й — <b>8%</b>, 3-й — <b>10%</b>, 4-й — <b>2%</b>. Уровни открываются: 1–2 ≥ $3k, 3 ≥ $10k, 4 ≥ $20k.</div>
+      <div class="row two">
+        <label><div>Средняя прибыль одного партнёра в месяц <span class="tip" data-tip="Оценка прибыли одного участника в месяц (в валюте калькулятора).">i</span></div><input type="number" id="affAvg" value="200" step="1" min="0"/></label>
+        <label><div>Месяцев учёта (обычно = годы × 12) <span class="tip" data-tip="Сколько месяцев учитывать для расчёта партнёрского дохода. По умолчанию берём годы × 12.">i</span></div><input type="number" id="affMonths" value="48" step="1" min="1"/></label>
+      </div>
+      <div class="affGrid">
+        <label><div>Партнёров 1-го уровня <span class="tip" data-tip="Лично приглашённые участники. Доступно при депозите ≥ $3,000.">i</span></div><input type="number" id="affL1" value="5" min="0"/></label>
+        <label><div>Партнёров 2-го уровня <span class="tip" data-tip="Участники, приглашённые вашими 1-м уровнем. Доступно при депозите ≥ $3,000.">i</span></div><input type="number" id="affL2" value="10" min="0"/></label>
+        <label><div>Партнёров 3-го уровня <span class="tip" data-tip="Открывается при депозите ≥ $10,000.">i</span></div><input type="number" id="affL3" value="0" min="0"/></label>
+        <label><div>Партнёров 4-го уровня <span class="tip" data-tip="Открывается при депозите ≥ $20,000.">i</span></div><input type="number" id="affL4" value="0" min="0"/></label>
+      </div>
+      <div class="kpiAff">
+        <div class="mini"><div class="label">Собственный доход (50% прибыли)</div><div class="val" id="ownShare">—</div><div class="hint">Работает при депозите ≥ $3,000</div></div>
+        <div class="mini"><div class="label">Партнёрский доход за период</div><div class="val" id="affTotal">—</div><div class="hint" id="affLevelsHint">Уровни: —</div></div>
+        <div class="mini"><div class="label">Итого: собственный + партнёрский</div><div class="val" id="grandTotal">—</div><div class="hint" id="affPerMonth">В среднем в месяц: —</div></div>
+      </div>
+    </div>
+  </div>
+
   <div class="card help" id="help" style="margin-top:16px">
     <div class="ctitle"><h3>Пошаговая инструкция</h3><span class="pill">Даже ребёнку понятно</span></div>
     <ol>
@@ -191,6 +219,7 @@ input,select{background:rgba(255,255,255,.02);border:1px solid #38e8ff30;color:v
       <li><b>Сценарии</b>: включите тумблер — три линии (пессимистичный/база/оптимистичный).</li>
       <li><b>Сохранение</b>: параметры можно шарить — URL обновляется, также сохраняем в браузере.</li>
       <li>Экспорт: <b>PNG</b>/<b>PDF</b>/<b>CSV</b> кнопками вверху (и в нижней панели на мобайле).</li>
+      <li><b>Партнёрка</b>: включите модуль, задайте число партнёров по уровням и среднюю прибыль одного участника в месяц. Уровни открываются от депозита: ≥$3k (1–2), ≥$10k (3), ≥$20k (4). Итог = 50% вашей прибыли + % от прибыли сети.</li>
     </ol>
   </div>
 
@@ -246,17 +275,17 @@ function simulate(params){
   return {final:bal,totalC,interest:bal-(+initial+totalC),yearly,investedYearly,ear};
 }
 function solveContribution(target, year, baseParams){
-  let low = 0, high = target || 1;
+  let low = 0, high = (target || 1);
   function val(c){ const r = simulate({...baseParams, contrib:c}); const y = r.yearly[Math.min(year-1, r.yearly.length-1)]; return y ? y.balance : r.final; }
   while(val(high) < target) high *= 2;
   for(let k=0;k<60;k++){ const mid=(low+high)/2; if(val(mid) >= target) high=mid; else low=mid; }
   return high;
 }
-const DEFAULTS = {mode:'annual',useAvgEar:false,initial:400000,currency:'₽',contrib:10000,contribFreq:12,rate:5,compound:12,mrate:2.0,mvol:3.0,fee:0,infl:0,timing:'end',years:4,scenarioOn:false,scenarioDelta:3,goalAmount:1000000,goalYear:4,senseRate:0,senseContrib:0};
-function getParamsFromInputs(){return {mode:i('modeMonthly').checked?'monthly':'annual',useAvgEar:i('useAvgEar').checked,initial:+i('initial').value||0,currency:i('currency').value,contrib:+i('contrib').value||0,contribFreq:+i('contribFreq').value||0,rate:+i('rate').value||0,compound:+i('compound').value||0,mrate:+i('mrate').value||0,mvol:+i('mvol').value||0,fee:+i('fee').value||0,infl:+i('infl').value||0,timing:i('timing').value,years:+i('years').value||0,scenarioOn:i('scenarioOn').checked,scenarioDelta:+i('scenarioDelta').value||0,goalAmount:+i('goalAmount').value||0,goalYear:+i('goalYear').value||0,senseRate:+i('senseRate').value||0,senseContrib:+i('senseContrib').value||0};}
-function applyParams(p){(p.mode==='monthly'? i('modeMonthly'):i('modeAnnual')).checked = true; i('useAvgEar').checked=!!p.useAvgEar; i('initial').value=p.initial; i('currency').value=p.currency; i('contrib').value=p.contrib; i('contribFreq').value=p.contribFreq; i('rate').value=p.rate; i('compound').value=p.compound; i('mrate').value=p.mrate; i('mvol').value=p.mvol; i('fee').value=p.fee; i('infl').value=p.infl; i('timing').value=p.timing; i('years').value=p.years; i('scenarioOn').checked=!!p.scenarioOn; i('scenarioDelta').value=p.scenarioDelta; i('goalAmount').value=p.goalAmount; i('goalYear').value=p.goalYear; i('senseRate').value=p.senseRate; i('senseContrib').value=p.senseContrib; setMode(p.mode); updateSenseLabels();}
-function saveState(){const p=getParamsFromInputs(); const url=new URL(location.href); const sp=url.searchParams; Object.entries(p).forEach(([k,v])=> sp.set(k, v)); history.replaceState(null,'',url.toString()); try{ localStorage.setItem('zeus_calc_state_v4', JSON.stringify(p)); }catch(e){} }
-function restoreState(){const url=new URL(location.href); const sp=url.searchParams; let state={...DEFAULTS}; if(sp && sp.keys().next().value){ sp.forEach((v,k)=>{ if(['mode','currency','timing'].includes(k)) state[k]=v; else if(['scenarioOn','useAvgEar'].includes(k)) state[k]=(v==='true'||v===true||v==='1'); else state[k]=+v;}); } else { try{ const raw=localStorage.getItem('zeus_calc_state_v4'); if(raw) state={...state, ...JSON.parse(raw)} }catch(e){} } applyParams(state);}
+const DEFAULTS = {mode:'annual',useAvgEar:false,initial:400000,currency:'₽',contrib:10000,contribFreq:12,rate:5,compound:12,mrate:2.0,mvol:3.0,fee:0,infl:0,timing:'end',years:4,scenarioOn:false,scenarioDelta:3,goalAmount:1000000,goalYear:4,senseRate:0,senseContrib:0,affOn:true,affAvg:200,affMonths:48,affL1:5,affL2:10,affL3:0,affL4:0};
+function getParamsFromInputs(){return {mode:i('modeMonthly').checked?'monthly':'annual',useAvgEar:i('useAvgEar').checked,initial:+i('initial').value||0,currency:i('currency').value,contrib:+i('contrib').value||0,contribFreq:+i('contribFreq').value||0,rate:+i('rate').value||0,compound:+i('compound').value||0,mrate:+i('mrate').value||0,mvol:+i('mvol').value||0,fee:+i('fee').value||0,infl:+i('infl').value||0,timing:i('timing').value,years:+i('years').value||0,scenarioOn:i('scenarioOn').checked,scenarioDelta:+i('scenarioDelta').value||0,goalAmount:+i('goalAmount').value||0,goalYear:+i('goalYear').value||0,senseRate:+i('senseRate').value||0,senseContrib:+i('senseContrib').value||0,affOn:i('affOn').checked,affAvg:+i('affAvg').value||0,affMonths:+i('affMonths').value||0,affL1:+i('affL1').value||0,affL2:+i('affL2').value||0,affL3:+i('affL3').value||0,affL4:+i('affL4').value||0};}
+function applyParams(p){(p.mode==='monthly'? i('modeMonthly'):i('modeAnnual')).checked = true; i('useAvgEar').checked=!!p.useAvgEar; i('initial').value=p.initial; i('currency').value=p.currency; i('contrib').value=p.contrib; i('contribFreq').value=p.contribFreq; i('rate').value=p.rate; i('compound').value=p.compound; i('mrate').value=p.mrate; i('mvol').value=p.mvol; i('fee').value=p.fee; i('infl').value=p.infl; i('timing').value=p.timing; i('years').value=p.years; i('scenarioOn').checked=!!p.scenarioOn; i('scenarioDelta').value=p.scenarioDelta; i('goalAmount').value=p.goalAmount; i('goalYear').value=p.goalYear; i('senseRate').value=p.senseRate; i('senseContrib').value=p.senseContrib; i('affOn').checked=!!p.affOn; i('affAvg').value=p.affAvg; i('affMonths').value=p.affMonths; i('affL1').value=p.affL1; i('affL2').value=p.affL2; i('affL3').value=p.affL3; i('affL4').value=p.affL4; setMode(p.mode); updateSenseLabels();}
+function saveState(){const p=getParamsFromInputs(); const url=new URL(location.href); const sp=url.searchParams; Object.entries(p).forEach(([k,v])=> sp.set(k, v)); history.replaceState(null,'',url.toString()); try{ localStorage.setItem('zeus_calc_state_v5', JSON.stringify(p)); }catch(e){} }
+function restoreState(){const url=new URL(location.href); const sp=url.searchParams; let state={...DEFAULTS}; if(sp && sp.keys().next().value){ sp.forEach((v,k)=>{ if(['mode','currency','timing'].includes(k)) state[k]=v; else if(['scenarioOn','useAvgEar','affOn'].includes(k)) state[k]=(v==='true'||v===true||v==='1'); else state[k]=+v;}); } else { try{ const raw=localStorage.getItem('zeus_calc_state_v5'); if(raw) state={...state, ...JSON.parse(raw)} }catch(e){} } applyParams(state);}
 function setMode(mode){ if(mode==='monthly'){ i('monthlyInputs').style.display='grid'; i('monthlyKPI').style.display='grid'; i('rate').setAttribute('disabled','disabled'); } else { i('monthlyInputs').style.display='none'; i('monthlyKPI').style.display='none'; i('rate').removeAttribute('disabled'); } }
 function updateSenseLabels(){ i('senseRateVal').textContent=(+i('senseRate').value||0).toFixed(2)+'%'; i('senseContribVal').textContent=(+i('senseContrib').value||0).toFixed(0)+'%'; }
 let chart;
@@ -298,9 +327,27 @@ function render(){
     const ds=[datasetsBase[0], {...datasetsBase[1], fill:{ target:2 }}, datasetsBase[2] ];
     chart=new Chart(ctx,{type:'line', data:{labels, datasets:ds}, options:{plugins:{legend:{labels:{color:'#d7eaff'}}}, scales:{x:{ticks:{color:'#9fb7ff'}}, y:{ticks:{color:'#9fb7ff'}}}}, plugins:[{id:'goalLine', afterDatasetsDraw:goalLinePlugin.afterDatasetsDraw}]});
   }
+
+  // ---- Affiliate / Partner program ----
+  const p = getParamsFromInputs();
+  const dep = +i('initial').value || 0;
+  const lvl1Open = dep >= 3000, lvl2Open = dep >= 3000, lvl3Open = dep >= 10000, lvl4Open = dep >= 20000;
+  const months = (p.affMonths>0? p.affMonths : (num(i('years').value)||0)*12);
+  const avg = Math.max(0, p.affAvg);
+  const l1 = (lvl1Open ? p.affL1 : 0), l2 = (lvl2Open ? p.affL2 : 0), l3 = (lvl3Open ? p.affL3 : 0), l4 = (lvl4Open ? p.affL4 : 0);
+  const affIncome = p.affOn ? months * avg * (0.05*l1 + 0.08*l2 + 0.10*l3 + 0.02*l4) : 0;
+  const ownIncome = (dep >= 3000) ? Math.max(0, r.interest*0.5) : 0;
+  const grand = ownIncome + affIncome;
+  if(i('ownShare')) i('ownShare').textContent = fmt(params.currency, ownIncome);
+  if(i('affTotal')) i('affTotal').textContent = fmt(params.currency, affIncome);
+  if(i('grandTotal')) i('grandTotal').textContent = fmt(params.currency, grand);
+  const levelsTxt = `1:${l1}${lvl1Open?'✓':'✕'} · 2:${l2}${lvl2Open?'✓':'✕'} · 3:${l3}${lvl3Open?'✓':'✕'} · 4:${l4}${lvl4Open?'✓':'✕'}`;
+  if(i('affLevelsHint')) i('affLevelsHint').textContent = 'Уровни: ' + levelsTxt;
+  if(i('affPerMonth')) i('affPerMonth').textContent = 'В месяц: ' + fmt(params.currency, (grand / Math.max(1, months)));
+
   saveState();
 }
-['initial','contrib','contribFreq','rate','fee','infl','compound','years','currency','timing','scenarioOn','scenarioDelta','mrate','mvol','useAvgEar','goalAmount','goalYear','senseRate','senseContrib']
+['initial','contrib','contribFreq','rate','fee','infl','compound','years','currency','timing','scenarioOn','scenarioDelta','mrate','mvol','useAvgEar','goalAmount','goalYear','senseRate','senseContrib','affOn','affAvg','affMonths','affL1','affL2','affL3','affL4']
   .forEach(id=> document.getElementById(id) && document.getElementById(id).addEventListener('input', ()=>{ 
     document.getElementById('senseRateVal').textContent=(+i('senseRate').value||0).toFixed(2)+'%';
     document.getElementById('senseContribVal').textContent=(+i('senseContrib').value||0).toFixed(0)+'%';
@@ -329,7 +376,7 @@ document.getElementById('solveGoal').addEventListener('click', ()=>{
   let p={ mode:i('modeMonthly').checked?'monthly':'annual', useAvgEar:i('useAvgEar').checked, initial:+i('initial').value||0, currency:i('currency').value, contrib:+i('contrib').value||0, contribFreq:+i('contribFreq').value||0, rate:+i('rate').value||0, compound:+i('compound').value||0, mrate:+i('mrate').value||0, mvol:+i('mvol').value||0, fee:+i('fee').value||0, infl:+i('infl').value||0, timing:i('timing').value, years:+i('years').value||0, scenarioOn:i('scenarioOn').checked, scenarioDelta:+i('scenarioDelta').value||0, goalAmount:+i('goalAmount').value||0, goalYear:+i('goalYear').value||0, senseRate:+i('senseRate').value||0, senseContrib:+i('senseContrib').value||0 };
   if(p.contribFreq===0){ p.contribFreq=12; i('contribFreq').value=12; }
   const baseParams = { initial:p.initial, contrib:p.contrib, contribFreq:p.contribFreq, rate:p.rate + p.senseRate, fee:p.fee, infl:p.infl, compound:p.compound, years:p.years, currency:p.currency, timing:p.timing };
-  const need=(function(target, year){ let low=0, high=(target || 1); function val(c){ const r=simulate({...baseParams, contrib:c}); const y=r.yearly[Math.min(year-1, r.yearly.length-1)]; return y?y.balance:r.final;} while(val(high)<target) high*=2; for(let k=0;k<60;k++){ const mid=(low+high)/2; if(val(mid)>=target) high=mid; else low=mid;} return high; })(p.goalAmount, p.goalYear);
+  const need = solveContribution(p.goalAmount, p.goalYear, baseParams);
   i('contrib').value = Math.round(need*100)/100; render();
   i('goalHint').textContent = 'Чтобы к '+p.goalYear+' году получить ~'+fmt(p.currency,p.goalAmount)+', внесение ≈ '+fmt(p.currency, i('contrib').value)+' за период.';
 });
