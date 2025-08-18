@@ -5,14 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ZEUS AI — Калькулятор сложных процентов</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%2338e8ff' d='M28 4l-6 20h10l-8 28 20-26H34l10-22z'/%3E%3C/svg%3E">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<!-- Локальный Chart.js-совместимый рендер -->
+<script src="./assets/js/chart.umd.min.js"></script>
 <style>
-:root{--bg:#08142f;--panel:#0e1d3f;--text:#d7eaff;--muted:#9fb7ff;--cyan:#38e8ff;--border:#38e8ff33}
+:root{--bg:#08142f;--panel:#0e1d3f;--text:#d7eaff;--muted:#9fb7ff;--cyan:#38e8ff;--border:#38e8ff33;--hl:#12305e}
 *{box-sizing:border-box}
 body{margin:0;background:radial-gradient(1000px 600px at 85% 10%, rgba(56,232,255,.08) 0%, rgba(56,232,255,0) 70%),radial-gradient(1200px 600px at 10% 0%,#13214a 0%,#0b1330 55%,#081027 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui}
-.wrap{max-width:1160px;margin:0 auto;padding:26px 14px}
-h1{margin:0 0 8px;color:var(--cyan)}
-.card{background:linear-gradient(180deg,var(--panel),#0b1836);border:1px solid var(--border);border-radius:16px;padding:16px;margin-top:14px}
+.wrap{max-width:1180px;margin:0 auto;padding:18px 14px 40px}
+h1{margin:10px 0 8px;color:var(--cyan)}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:8px 0 12px}
+.menu{display:flex;gap:8px;flex-wrap:wrap}
+.btn{background:var(--hl);border:1px solid var(--border);color:#fff;border-radius:14px;padding:8px 12px;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.card{background:linear-gradient(180deg,var(--panel),#0b1836);border:1px solid var(--border);border-radius:16px;padding:14px;margin-top:14px}
 .ctitle{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .pill{font-size:12px;color:#9bdfff;border:1px solid var(--border);padding:3px 8px;border-radius:12px}
 .fields label{display:block;font-size:14px;margin-bottom:8px}
@@ -28,11 +33,31 @@ h1{margin:0 0 8px;color:var(--cyan)}
 .hint{font-size:12px;color:#9fb7ff;margin-top:4px}
 table{width:100%;border-collapse:collapse;margin-top:6px}th,td{border-bottom:1px dashed #2b3f6a;padding:6px 8px;text-align:right}th:first-child,td:first-child{text-align:left}
 canvas{width:100%;height:340px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:16px}
+.modal .box{max-width:760px;background:#0a1840;border:1px solid var(--border);border-radius:16px;padding:18px}
+.modal .box h3{margin:0 0 10px;color:#aee6ff}
+.modal .box p{margin:0 0 8px;color:#cfe5ff}
+@media print{
+  .topbar{display:none}
+  body{background:#fff;color:#000}
+  .card{border:1px solid #bbb}
+  canvas{height:260px}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Калькулятор сложных процентов</h1>
+  <div class="topbar">
+    <h1>Калькулятор сложных процентов</h1>
+    <div class="menu">
+      <button class="btn" id="btnReset" title="Сбросить все поля к значениям по умолчанию">Сброс</button>
+      <button class="btn" id="btnHelp" title="Поясняющая инструкция и формулы">Инструкция</button>
+      <button class="btn" id="btnShare" title="Сформировать ссылку с параметрами текущего расчёта">Поделиться</button>
+      <button class="btn" id="btnPNG" title="Скачать общий PNG с графиком и KPI">PNG</button>
+      <button class="btn" id="btnPDF" title="Экспорт в PDF через диалог печати">PDF</button>
+      <button class="btn" id="btnCSV" title="Скачать CSV с таблицей и партнёркой">CSV</button>
+    </div>
+  </div>
 
   <div class="grid">
     <div class="card">
@@ -52,8 +77,8 @@ canvas{width:100%;height:340px}
           <div class="hint">Годовая EAR из месячной: <b id="earFromMonthly">—</b></div>
         </div>
         <div class="row two">
-          <label>Первоначальная сумма, $<input type="number" id="initial" value="3000" step="1" min="0"></label>
-          <label>Регулярное пополнение, $<input type="number" id="contrib" value="0" step="1" min="0"></label>
+          <label>Первоначальная сумма, <span id="curr1">$</span><input type="number" id="initial" value="3000" step="1" min="0"></label>
+          <label>Регулярное пополнение, <span id="curr2">$</span><input type="number" id="contrib" value="0" step="1" min="0"></label>
         </div>
         <div class="row two">
           <label>Частота пополнений<select id="contribFreq"><option value="12" selected>Ежемесячно (12)</option><option value="4">Ежеквартально (4)</option><option value="1">Ежегодно (1)</option><option value="0">Без пополнений</option></select></label>
@@ -132,6 +157,18 @@ canvas{width:100%;height:340px}
   </div>
 </div>
 
+<div class="modal" id="helpModal"><div class="box">
+  <h3>Инструкция</h3>
+  <p><b>Сброс</b> — возвращает значения по умолчанию.</p>
+  <p><b>Инструкция</b> — открывает это окно с подсказками и формулами.</p>
+  <p><b>Поделиться</b> — формирует URL с текущими параметрами.</p>
+  <p><b>PNG</b> — скачивает картинку с графиком и KPI.</p>
+  <p><b>PDF</b> — печать страницы в PDF (используйте «Сохранить как PDF»).</p>
+  <p><b>CSV</b> — выгружает таблицу результатов и партнёрки.</p>
+  <p style="margin-top:8px"><b>Формулы:</b> EAR = (1 + r<sub>net</sub>/n)<sup>n</sup> − 1, где r<sub>net</sub> = (ставка − комиссия)/100, n — капитализаций в год. Для месячной ставки: EAR = (1 + m)<sup>12</sup> − 1.</p>
+  <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end"><button class="btn" onclick="i('helpModal').style.display='none'">Закрыть</button></div>
+</div></div>
+
 <script>
 const $ = s => document.querySelector(s);
 const i = id => document.getElementById(id);
@@ -139,6 +176,7 @@ function lcm(a,b){const g=(x,y)=>y===0?x:g(y,x%y);return a*b/g(a,b)}
 function fmt(sym,n){return sym+' '+(+n).toLocaleString(undefined,{maximumFractionDigits:2})}
 function clamp(x,minv,maxv){return Math.max(minv, Math.min(maxv, x));}
 
+// core simulate
 function simulate(params){
   const {initial,contrib,contribFreq,rate,fee,infl,compound,years,timing,currency} = params;
   const n = Math.max(1, Math.floor(compound));
@@ -185,14 +223,69 @@ function getParams(){
   };
 }
 
+function setParams(p){
+  i('initial').value=p.initial; i('contrib').value=p.contrib; i('contribFreq').value=p.contribFreq; i('rate').value=p.rate; i('fee').value=p.fee;
+  i('infl').value=p.infl; i('compound').value=p.compound; i('years').value=p.years; i('timing').value=p.timing; i('currency').value=p.currency;
+  (p.mode==='monthly'? i('modeMonthly'):i('modeAnnual')).checked=true;
+  i('mrate').value=p.mrate; i('mvol').value=p.mvol;
+  i('affOn').checked=p.affOn; i('affAvg').value=p.affAvg; i('affMonths').value=p.affMonths; i('affL1').value=p.affL1; i('affL2').value=p.affL2; i('affL3').value=p.affL3; i('affL4').value=p.affL4;
+  i('affAuto').checked=p.affAuto; i('affP3k').value=p.affP3k; i('affP10k').value=p.affP10k; i('affP20k').value=p.affP20k;
+}
+
+function defaults(){
+  return {initial:3000, contrib:0, contribFreq:12, rate:24, fee:0, infl:0, compound:12, years:3, timing:'begin', currency:'$', mode:'annual', mrate:2, mvol:0, affOn:true, affAvg:200, affMonths:48, affL1:20, affL2:50, affL3:100, affL4:300, affAuto:false, affP3k:60, affP10k:30, affP20k:10};
+}
+
 function applyURL(){
   const url=new URL(location.href);
   const get=v=>url.searchParams.get(v);
-  const ids=['initial','contrib','contribFreq','rate','fee','infl','compound','years','timing','currency','mrate','mvol','affAvg','affMonths','affL1','affL2','affL3','affL4'];
-  ids.forEach(k=>{ const v=get(k); if(v!==null){ i(k).value=v; } });
-  const cb=['affOn']; cb.forEach(k=>{ const v=get(k); if(v!==null) i(k).checked=(v==='true'||v==='1'); });
-  const mode=get('mode'); if(mode==='monthly'){ i('modeMonthly').checked=true; i('modeAnnual').checked=false; }
+  const p=defaults();
+  Object.keys(p).forEach(k=>{
+    const v=get(k);
+    if(v!==null){
+      if(typeof p[k]==='boolean') p[k]=(v==='true'||v==='1');
+      else if(!isNaN(+p[k])) { const n=+v; if(!isNaN(n)) p[k]=n; else p[k]=v; }
+      else p[k]=v;
+    }
+  });
+  setParams(p);
 }
+
+function shareURL(){
+  const p=getParams();
+  const u=new URL(location.href.split('?')[0]);
+  Object.entries(p).forEach(([k,v])=>u.searchParams.set(k,String(v)));
+  history.replaceState(null,'',u.toString());
+  return u.toString();
+}
+
+function exportCSV(rows, filename){
+  const csv = rows.map(r=> r.map(v=> `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.click();
+}
+
+function exportPNG(filename){
+  // Compose PNG with main chart + KPIs
+  const c1=i('chart'); const c2=i('affChart');
+  const W = Math.max(c1.clientWidth, 900), H = 500 + (c2? c2.clientHeight:0) + 120;
+  const out=document.createElement('canvas'); out.width=W; out.height=H;
+  const ctx=out.getContext('2d'); ctx.fillStyle="#0e1d3f"; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle="#aee6ff"; ctx.font="20px Arial"; ctx.fillText("ZEUS AI — Калькулятор сложных процентов", 20, 28);
+  ctx.font="14px Arial"; ctx.fillStyle="#cfe5ff"; ctx.fillText(new Date().toLocaleString(), 20, 52);
+  function drawCanvas(src, x, y){
+    const dpr = window.devicePixelRatio || 1;
+    const tmp=document.createElement('canvas');
+    tmp.width=src.clientWidth*dpr; tmp.height=src.clientHeight*dpr;
+    const tctx=tmp.getContext('2d'); tctx.scale(dpr,dpr); tctx.drawImage(src,0,0,src.clientWidth,src.clientHeight);
+    ctx.drawImage(tmp, x, y, src.clientWidth, src.clientHeight);
+  }
+  drawCanvas(c1, 20, 70);
+  if(c2) drawCanvas(c2, 20, 90 + c1.clientHeight);
+  const a=document.createElement('a'); a.href=out.toDataURL("image/png"); a.download=filename; a.click();
+}
+
+function openHelp(){ i('helpModal').style.display='flex'; }
 
 function render(){
   const p=getParams();
@@ -207,10 +300,12 @@ function render(){
   }
   i('annualBox').style.display=isMonthly?'none':'';
   i('monthlyBox').style.display=isMonthly?'':'none';
-  i('currSym').textContent = p.currency;
+  i('curr1').textContent=i('curr2').textContent=i('currSym').textContent=p.currency;
 
   const r=simulate(p);
-  i('tcontrib').textContent=fmt(p.currency, p.contrib * (p.contribFreq>0?p.years*p.contribFreq:0));
+  // внесено: только регулярные пополнения (как у тебя было в макете)
+  const contributed = (p.contribFreq>0? p.years*p.contribFreq:0)*p.contrib;
+  i('tcontrib').textContent=fmt(p.currency, contributed);
   i('tinterest').textContent=fmt(p.currency, r.interest);
   i('earVal').textContent=(r.ear*100).toFixed(2)+'%';
   const tb=i('tbody'); tb.innerHTML='';
@@ -221,7 +316,7 @@ function render(){
   const invested=r.investedYearly;
   const ctx=i('chart').getContext('2d'); if(chart) chart.destroy();
   chart=new Chart(ctx,{type:'line', data:{labels, datasets:[{label:'Внесено',data:invested,fill:true},{label:'Итог',data:balances,fill:false}]},
-    options:{plugins:{legend:{labels:{color:'#d7eaff'}}}, scales:{x:{ticks:{color:'#9fb7ff'}}, y:{ticks:{color:'#9fb7ff'}}}}});
+    options:{plugins:{legend:{labels:{color:'#d7eaff'}}}}});
 
   const dep=p.initial; const lvl1Open=dep>=3000, lvl2Open=dep>=3000, lvl3Open=dep>=10000, lvl4Open=dep>=20000;
   i('affAutoBox').style.display = p.affAuto ? 'block' : 'none';
@@ -249,12 +344,41 @@ function render(){
 
   const ac=i('affChart').getContext('2d'); if(affChart) affChart.destroy();
   affChart=new Chart(ac,{type:'bar', data:{labels:['L1','L2','L3','L4'], datasets:[{label:'Месячная прибыль', data:[l1Mon,l2Mon,l3Mon,l4Mon]}]},
-    options:{plugins:{legend:{labels:{color:'#d7eaff'}}}, scales:{x:{ticks:{color:'#9fb7ff'}}, y:{ticks:{color:'#9fb7ff'}}}}});
+    options:{plugins:{legend:{labels:{color:'#d7eaff'}}}}});
 }
 
 function bind(){
   const ids=['modeAnnual','modeMonthly','rate','fee','infl','compound','mrate','mvol','initial','contrib','contribFreq','years','timing','currency','affOn','affAvg','affMonths','affL1','affL2','affL3','affL4','affAuto','affP3k','affP10k','affP20k'];
   ids.forEach(id=>{ const el=i(id); if(!el) return; el.addEventListener('input',render); el.addEventListener('change',render); });
+  i('btnHelp').addEventListener('click', openHelp);
+  i('btnPNG').addEventListener('click', ()=>exportPNG('zeus_calc.png'));
+  i('btnPDF').addEventListener('click', ()=>window.print());
+  i('btnCSV').addEventListener('click', ()=>{
+    const p=getParams(); const r=simulate(p);
+    const rows=[["Год","Баланс","Реально (с инфл.)"]];
+    r.yearly.forEach(y=>rows.push([y.year, y.balance, y.real]));
+    rows.push([]);
+    rows.push(["Партнёрка","L1 мон","L2 мон","L3 мон","L4 мон","Период (мес)"]);
+    // recompute monthly per level to put into csv
+    const dep=p.initial; const lvl1Open=dep>=3000, lvl2Open=dep>=3000, lvl3Open=dep>=10000, lvl4Open=dep>=20000;
+    let avg=Math.max(0,p.affAvg);
+    if(p.affAuto){ const mEff=Math.pow(1+r.ear,1/12)-1;
+      const w3=Math.max(0,p.affP3k), w10=Math.max(0,p.affP10k), w20=Math.max(0,p.affP20k);
+      const sum=Math.max(1,w3+w10+w20);
+      avg=(w3/sum)*(3000*mEff)+(w10/sum)*(10000*mEff)+(w20/sum)*(20000*mEff);
+    }
+    const l1=(lvl1Open?p.affL1:0), l2=(lvl2Open?p.affL2:0), l3=(lvl3Open?p.affL3:0), l4=(lvl4Open?p.affL4:0);
+    const l1Mon=p.affOn? avg*(0.05*l1):0, l2Mon=p.affOn? avg*(0.08*l2):0, l3Mon=p.affOn? avg*(0.10*l3):0, l4Mon=p.affOn? avg*(0.02*l4):0;
+    rows.push([ "", l1Mon, l2Mon, l3Mon, l4Mon, p.affMonths ]);
+    exportCSV(rows, 'zeus_calc.csv');
+  });
+  i('btnShare').addEventListener('click', ()=>{
+    const url=shareURL();
+    navigator.clipboard && navigator.clipboard.writeText(url);
+    i('btnShare').textContent='Ссылка скопирована'; setTimeout(()=>i('btnShare').textContent='Поделиться',1800);
+  });
+  i('btnReset').addEventListener('click', ()=>{ setParams(defaults()); render(); });
+  i('helpModal').addEventListener('click', (e)=>{ if(e.target.id==='helpModal') i('helpModal').style.display='none'; });
 }
 
 applyURL(); bind(); render();
