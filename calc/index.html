@@ -3,201 +3,225 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ZEUS AI — Калькулятор сложных процентов (Single File)</title>
+<title>ZEUS AI — Калькулятор сложных процентов</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%2338e8ff' d='M28 4l-6 20h10l-8 28 20-26H34l10-22z'/%3E%3C/svg%3E">
+<!-- Local Chart.js: tries official path first, falls back to local stub -->
+<script src="./assets/js/chartjs-official/chart.umd.min.js" onerror="var s=document.createElement('script');s.src='./assets/js/chart.umd.min.js';document.head.appendChild(s)"></script>
 <style>
-:root{--bg:#08142f;--panel:#0e1d3f;--text:#d7eaff;--muted:#9fb7ff;--cyan:#38e8ff;--border:#38e8ff33;--hl:#12305e}
+:root{
+  --bg:#070e23; --bg2:#0b1636; --panel:#0e1d3f; --panel2:#0b1836;
+  --text:#e7f2ff; --muted:#a9c2ff; --cyan:#38e8ff; --accent:#6ae3ff;
+  --border:#38e8ff33; --glow:0 8px 24px rgba(56,232,255,.15);
+}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(1000px 600px at 85% 10%, rgba(56,232,255,.08) 0%, rgba(56,232,255,0) 70%),radial-gradient(1200px 600px at 10% 0%,#13214a 0%,#0b1330 55%,#081027 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui}
-.wrap{max-width:1180px;margin:0 auto;padding:18px 14px 40px}
-h1{margin:10px 0 8px;color:var(--cyan)}
-.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:8px 0 12px}
-.menu{display:flex;gap:8px;flex-wrap:wrap}
-.btn{background:var(--hl);border:1px solid var(--border);color:#fff;border-radius:14px;padding:8px 12px;cursor:pointer}
-.card{background:linear-gradient(180deg,var(--panel),#0b1836);border:1px solid var(--border);border-radius:16px;padding:14px;margin-top:14px}
-.ctitle{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.pill{font-size:12px;color:#9bdfff;border:1px solid var(--border);padding:3px 8px;border-radius:12px}
-.fields label{display:block;font-size:14px;margin-bottom:8px}
-.fields input,.fields select{width:100%;background:#091537;border:1px solid var(--border);border-radius:10px;color:var(--text);padding:8px 10px}
-.row{display:grid;gap:10px}.row.two{grid-template-columns:repeat(2,minmax(160px,1fr))}.row.three{grid-template-columns:repeat(3,minmax(120px,1fr))}
-.grid{display:grid;grid-template-columns:minmax(340px,520px) minmax(360px,1fr);gap:18px}
-.kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
-.mini{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:10px}
-.mini .label{font-size:12px;color:#9fb7ff}.mini .value{font-weight:700}
-.segment{display:inline-flex;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.segment input{display:none}.segment label{padding:8px 10px;font-size:13px;color:#cfeaff;cursor:pointer}.segment input:checked+label{background:#12305e;color:#fff}
-.affGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px}
-.hint{font-size:12px;color:#9fb7ff;margin-top:4px}
-table{width:100%;border-collapse:collapse;margin-top:6px}th,td{border-bottom:1px dashed #2b3f6a;padding:6px 8px;text-align:right}th:first-child,td:first-child{text-align:left}
-canvas{width:100%;height:340px}
+html,body{height:100%}
+body{
+  margin:0; font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 700px at 85% -10%, rgba(56,232,255,.08) 0%, rgba(56,232,255,0) 70%),
+    radial-gradient(1100px 600px at -10% 0%, #182a65 0%, #0e183e 55%, #070e23 100%);
+}
+.container{max-width:1200px;margin:0 auto;padding:28px 16px 44px}
+.header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:10px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:linear-gradient(180deg,var(--panel),var(--panel2));box-shadow:var(--glow);}
+.brand h1{font-size:22px;line-height:1.2;margin:0;color:var(--accent);letter-spacing:.3px}
+.topmenu{display:flex;gap:8px;flex-wrap:wrap}
+.btn{background:linear-gradient(180deg,#132a64,#0e1f47);border:1px solid var(--border);border-radius:12px;color:#fff;padding:10px 12px;cursor:pointer;box-shadow:var(--glow);}
+.btn:hover{transform:translateY(-1px)}
+.grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}
+@media (max-width: 980px){.grid{grid-template-columns:1fr}}
+.card{
+  background:linear-gradient(180deg,var(--panel),var(--panel2));
+  border:1px solid var(--border); border-radius:16px; padding:16px;
+  box-shadow:var(--glow);
+}
+.card .title{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.card .title h3{margin:0;color:var(--accent);font-size:16px;letter-spacing:.2px}
+.pill{font-size:12px;color:#bfeaff;border:1px solid var(--border);padding:3px 8px;border-radius:12px}
+.row{display:grid;gap:10px}.two{grid-template-columns:repeat(2,minmax(160px,1fr))}.three{grid-template-columns:repeat(3,minmax(120px,1fr))}
+label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+input,select{background:#0a1535;border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 12px;outline:none}
+.segment{display:inline-flex;background:#091537;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:6px}
+.segment input{display:none}.segment label{padding:8px 12px;font-size:13px;color:#cfeaff;cursor:pointer}.segment input:checked+label{background:#12305e;color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.kpi{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:12px 12px 10px}
+.kpi .k{font-size:12px;color:var(--muted)} .kpi .v{font-weight:700;font-size:16px;margin-top:4px}
+.table{margin-top:10px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead th{font-size:12px;color:#bfeaff;background:#0a1840}
+th,td{padding:10px 12px;border-bottom:1px dashed #27406e}
+tbody tr:hover{background:#0d1b46}
+.canv-wrap{background:linear-gradient(180deg,#0a1840,#091537);border:1px solid var(--border);border-radius:14px;padding:10px}
+canvas{width:100%;height:360px;display:block}
+/* Tooltips */
 .i{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:6px;border-radius:50%;border:1px solid var(--border);color:#9bdfff;font-size:12px;cursor:help;position:relative}
-.i:hover::after{content:attr(data-tip);position:absolute;left:20px;top:-4px;min-width:220px;max-width:360px;background:#0a1840;color:#cfeaff;border:1px solid var(--border);padding:8px 10px;border-radius:10px;white-space:normal;z-index:10}
-@media print{.topbar{display:none}}
+.i:hover::after{content:attr(data-tip);position:absolute;left:20px;top:-4px;min-width:240px;max-width:380px;background:#0a1840;color:#cfeaff;border:1px solid var(--border);padding:8px 10px;border-radius:10px;white-space:normal;z-index:10;box-shadow:var(--glow)}
+/* Partner chart legend strip */
+.legend-strip{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.l-chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:999px;padding:6px 10px;background:#0a1840}
+.l-dot{width:10px;height:10px;border-radius:50%}
+/* Footer note */
+.note{color:#98b1ff;font-size:12px;margin-top:8px}
+@media print{.header{display:none} body{background:#fff;color:#000} .card{box-shadow:none}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="topbar">
-    <h1>Калькулятор сложных процентов</h1>
-    <div class="menu">
-      <button class="btn" id="btnReset">Сброс</button>
-      <button class="btn" id="btnShare">Поделиться</button>
-      <button class="btn" id="btnPNG">PNG</button>
-      <button class="btn" id="btnPDF">PDF</button>
-      <button class="btn" id="btnCSV">CSV</button>
+<div class="container">
+  <div class="header">
+    <div class="brand">
+      <div class="badge">ZEUS&nbsp;AI</div>
+      <h1>Калькулятор сложных процентов</h1>
+    </div>
+    <div class="topmenu">
+      <button class="btn" id="btnReset" title="Сбросить значения">Сброс</button>
+      <button class="btn" id="btnShare" title="Скопировать ссылку с параметрами">Поделиться</button>
+      <button class="btn" id="btnPNG" title="Экспорт PNG">PNG</button>
+      <button class="btn" id="btnPDF" title="Печать / PDF">PDF</button>
+      <button class="btn" id="btnCSV" title="Экспорт CSV">CSV</button>
     </div>
   </div>
 
   <div class="grid">
     <div class="card">
-      <div class="ctitle"><h3>Параметры</h3><span class="pill">ZEUS AI</span></div>
-      <div class="fields">
-        <div class="segment">
-          <input type="radio" id="modeAnnual" name="mode" value="annual" checked><label for="modeAnnual">Годовая ставка</label>
-          <input type="radio" id="modeMonthly" name="mode" value="monthly"><label for="modeMonthly">Месячная ставка</label>
-        </div>
-        <div id="annualBox" class="row two" style="margin-top:8px">
-          <label>Годовая ставка, % <span class="i" data-tip="Номинальная годовая ставка (APR). Комиссия вычитается ниже.">i</span><input type="number" id="rate" value="24" step="0.01"></label>
-          <label>Комиссия/издержки, % <span class="i" data-tip="Годовые комиссии/издержки. Вычитаются из ставки перед начислением.">i</span><input type="number" id="fee" value="0" step="0.01"></label>
-        </div>
-        <div id="monthlyBox" class="row two" style="margin-top:8px;display:none">
-          <label>Месячная ставка, % <span class="i" data-tip="Средняя доходность за месяц (m). Конвертируется в годовую EAR как (1+m)^12-1.">i</span><input type="number" id="mrate" value="2" step="0.001"></label>
-          <label>Колебания, ±% <span class="i" data-tip="Диапазон отклонений месячной доходности.">i</span><input type="number" id="mvol" value="0" step="0.01"></label>
-          <div class="hint">Годовая EAR из месячной: <b id="earFromMonthly">—</b></div>
-        </div>
-        <div class="row two">
-          <label>Первоначальная сумма <span class="i" data-tip="Стартовый депозит. ≥ $3k — включается собственный доход 50% от прибыли.">i</span><input type="number" id="initial" value="3000" step="1" min="0"></label>
-          <label>Регулярное пополнение <span class="i" data-tip="Сумма каждого взноса.">i</span><input type="number" id="contrib" value="0" step="1" min="0"></label>
-        </div>
-        <div class="row two">
-          <label>Частота пополнений <span class="i" data-tip="Сколько раз в год. 0 — без пополнений.">i</span><select id="contribFreq"><option value="12" selected>Ежемесячно (12)</option><option value="4">Ежеквартально (4)</option><option value="1">Ежегодно (1)</option><option value="0">Без пополнений</option></select></label>
-          <label>Капитализация <span class="i" data-tip="Как часто начисляются проценты в год.">i</span><select id="compound"><option value="12" selected>Ежемесячно (12)</option><option value="4">Ежеквартально (4)</option><option value="1">Ежегодно (1)</option></select></label>
-        </div>
-        <div class="row two">
-          <label>Срок, лет <span class="i" data-tip="Сколько лет моделируем.">i</span><input type="number" id="years" value="3" step="1" min="1"></label>
-          <label>Инфляция, % <span class="i" data-tip="Используется для столбца «Реально (с инфляцией)».">i</span><input type="number" id="infl" value="0" step="0.01"></label>
-        </div>
-        <div class="row two">
-          <label>Момент пополнения <span class="i" data-tip="В начале — деньги в работе сразу; в конце — со следующего периода.">i</span><select id="timing"><option value="begin" selected>В начале периода</option><option value="end">В конце периода</option></select></label>
-          <label>Валюта <span class="i" data-tip="Только символ в интерфейсе.">i</span><select id="currency"><option value="$" selected>$</option><option value="€">€</option><option value="₽">₽</option></select></label>
-        </div>
-        <div class="kpi">
-          <div class="mini"><div class="label">Внесено, всего <span class="i" data-tip="Все регулярные взносы за период (без старта).">i</span></div><div class="value" id="tcontrib">—</div></div>
-          <div class="mini"><div class="label">Начислено процентов <span class="i" data-tip="Финальный баланс минус все внесения и старт.">i</span></div><div class="value" id="tinterest">—</div></div>
-          <div class="mini"><div class="label">EAR (эффективная годовая) <span class="i" data-tip="(1 + r_net/n)^n − 1, r_net = (ставка − комиссия)/100.">i</span></div><div class="value" id="earVal">—</div></div>
-        </div>
+      <div class="title"><h3>Параметры</h3><span class="pill">основа</span></div>
+      <div class="segment">
+        <input type="radio" id="modeAnnual" name="mode" value="annual" checked><label for="modeAnnual">Годовая ставка</label>
+        <input type="radio" id="modeMonthly" name="mode" value="monthly"><label for="modeMonthly">Месячная ставка</label>
+      </div>
+
+      <div id="annualBox" class="row two">
+        <label>Годовая ставка, % <span class="i" data-tip="Номинальная годовая ставка (APR). Комиссии ниже уменьшают её.">i</span>
+          <input type="number" id="rate" value="24" step="0.01"></label>
+        <label>Комиссия/издержки, % <span class="i" data-tip="Годовые комиссии/издержки. Вычитаются из ставки перед начислением.">i</span>
+          <input type="number" id="fee" value="0" step="0.01"></label>
+      </div>
+
+      <div id="monthlyBox" class="row two" style="display:none">
+        <label>Месячная ставка, % <span class="i" data-tip="Средняя доходность за месяц (m). Конвертация в EAR: (1+m)^12 − 1.">i</span>
+          <input type="number" id="mrate" value="2" step="0.001"></label>
+        <label>Колебания, ±% <span class="i" data-tip="Диапазон отклонений для подсказки диапазона годовой доходности.">i</span>
+          <input type="number" id="mvol" value="0" step="0.01"></label>
+        <div class="note">EAR из месячной: <b id="earFromMonthly">—</b></div>
+      </div>
+
+      <div class="row two">
+        <label>Первоначальная сумма <span class="i" data-tip="Стартовый депозит. ≥ $3k — включается собственный доход 50% от прибыли.">i</span>
+          <input type="number" id="initial" value="3000" step="1" min="0"></label>
+        <label>Регулярное пополнение <span class="i" data-tip="Фиксированная сумма взноса за период (см. частоту).">i</span>
+          <input type="number" id="contrib" value="0" step="1" min="0"></label>
+      </div>
+
+      <div class="row two">
+        <label>Частота пополнений <span class="i" data-tip="Сколько раз в год вносите регулярные взносы. 0 — без пополнений.">i</span>
+          <select id="contribFreq"><option value="12" selected>Ежемесячно (12)</option><option value="4">Ежеквартально (4)</option><option value="1">Ежегодно (1)</option><option value="0">Без пополнений</option></select></label>
+        <label>Капитализация <span class="i" data-tip="Как часто проценты добавляются к телу депозита. Влияет на EAR.">i</span>
+          <select id="compound"><option value="12" selected>Ежемесячно (12)</option><option value="4">Ежеквартально (4)</option><option value="1">Ежегодно (1)</option></select></label>
+      </div>
+
+      <div class="row two">
+        <label>Срок, лет <span class="i" data-tip="Продолжительность моделирования (годы).">i</span>
+          <input type="number" id="years" value="3" step="1" min="1"></label>
+        <label>Инфляция, % <span class="i" data-tip="Используется для столбца «Реально (с инфл.)».">i</span>
+          <input type="number" id="infl" value="0" step="0.01"></label>
+      </div>
+
+      <div class="row two">
+        <label>Момент пополнения <span class="i" data-tip="«В начале» — взнос сразу работает; «В конце» — со следующего периода.">i</span>
+          <select id="timing"><option value="begin" selected>В начале периода</option><option value="end">В конце периода</option></select></label>
+        <label>Валюта <span class="i" data-tip="Только отображение символа. Конвертации нет.">i</span>
+          <select id="currency"><option value="$" selected>$</option><option value="€">€</option><option value="₽">₽</option></select></label>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi"><div class="k">Внесено, всего</div><div class="v" id="tcontrib">—</div></div>
+        <div class="kpi"><div class="k">Начислено процентов</div><div class="v" id="tinterest">—</div></div>
+        <div class="kpi"><div class="k">EAR (эффективная)</div><div class="v" id="earVal">—</div></div>
       </div>
     </div>
 
     <div class="card">
-      <div class="ctitle"><h3>Результаты</h3><span class="pill">График</span></div>
-      <canvas id="chart"></canvas>
-      <table>
-        <thead><tr><th>Год</th><th>Баланс</th><th>Реально (с инфл.)</th></tr></thead>
-        <tbody id="tbody"></tbody>
-      </table>
+      <div class="title"><h3>Результаты</h3><span class="pill">график + таблица</span></div>
+      <div class="canv-wrap"><canvas id="chart"></canvas></div>
+      <div class="table">
+        <table>
+          <thead><tr><th>Год</th><th>Баланс</th><th>Реально (с инфл.)</th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <div class="card">
-    <div class="ctitle"><h3>Партнёрская программа (копитрейдинг)</h3><span class="pill">Доход от сети</span></div>
-    <div class="fields">
-      <label><input type="checkbox" id="affOn" checked> Учитывать партнёрские вознаграждения</label>
-      <div class="row two">
-        <label>Средняя прибыль партнёра в месяц<input type="number" id="affAvg" value="200" step="1" min="0"></label>
-        <label>Месяцев учёта<input type="number" id="affMonths" value="48" step="1" min="1"></label>
-      </div>
-      <div class="affGrid">
-        <label>Партнёров 1-го уровня<input type="number" id="affL1" value="20" min="0"></label>
-        <label>Партнёров 2-го уровня<input type="number" id="affL2" value="50" min="0"></label>
-        <label>Партнёров 3-го уровня<input type="number" id="affL3" value="100" min="0"></label>
-        <label>Партнёров 4-го уровня<input type="number" id="affL4" value="300" min="0"></label>
-      </div>
-      <div class="kpi">
-        <div class="mini"><div class="label">Месячная прибыль L1</div><div class="value" id="affL1Mon">—</div></div>
-        <div class="mini"><div class="label">Месячная прибыль L2</div><div class="value" id="affL2Mon">—</div></div>
-        <div class="mini"><div class="label">Месячная прибыль L3</div><div class="value" id="affL3Mon">—</div></div>
-        <div class="mini"><div class="label">Месячная прибыль L4</div><div class="value" id="affL4Mon">—</div></div>
-      </div>
-
-      <div class="card" style="background:rgba(255,255,255,.03);margin-top:10px">
-        <h4 style="margin:6px 0 8px">Диаграмма партнёрской прибыли</h4>
-        <canvas id="affChart"></canvas>
-      </div>
+  <div class="card" style="margin-top:18px">
+    <div class="title"><h3>Партнёрская программа</h3><span class="pill">копитрейдинг</span></div>
+    <div class="row two">
+      <label><span>Учитывать партнёрку</span><input type="checkbox" id="affOn" checked></label>
+      <label>Средняя прибыль партнёра в месяц<input type="number" id="affAvg" value="200" step="1" min="0"></label>
     </div>
+    <div class="row two">
+      <label>Месяцев учёта<input type="number" id="affMonths" value="48" step="1" min="1"></label>
+      <span class="note">Уровни: L1 5%, L2 8%, L3 10%, L4 2%.</span>
+    </div>
+    <div class="row four" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px">
+      <label>L1 — личные<input type="number" id="affL1" value="20" min="0"></label>
+      <label>L2 — рефералы L1<input type="number" id="affL2" value="50" min="0"></label>
+      <label>L3 — рефералы L2<input type="number" id="affL3" value="100" min="0"></label>
+      <label>L4 — глубина<input type="number" id="affL4" value="300" min="0"></label>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="k">Месячная прибыль L1</div><div class="v" id="affL1Mon">—</div></div>
+      <div class="kpi"><div class="k">Месячная прибыль L2</div><div class="v" id="affL2Mon">—</div></div>
+      <div class="kpi"><div class="k">Месячная прибыль L3</div><div class="v" id="affL3Mon">—</div></div>
+      <div class="kpi"><div class="k">Месячная прибыль L4</div><div class="v" id="affL4Mon">—</div></div>
+    </div>
+
+    <div class="legend-strip">
+      <div class="l-chip"><span class="l-dot" style="background:#6ec1ff"></span> Месяц</div>
+      <div class="l-chip"><span class="l-dot" style="background:#ff8ea1"></span> 1 год</div>
+      <div class="l-chip"><span class="l-dot" style="background:#8effa4"></span> 2 года</div>
+      <div class="l-chip"><span class="l-dot" style="background:#f8d47b"></span> 3 года</div>
+    </div>
+    <div class="canv-wrap" style="margin-top:10px"><canvas id="affChart"></canvas></div>
+    <div class="kpis">
+      <div class="kpi"><div class="k">Собственный доход (50% процентов)</div><div class="v" id="ownShare">—</div></div>
+      <div class="kpi"><div class="k">Партнёрский доход за период</div><div class="v" id="affTotal">—</div></div>
+      <div class="kpi"><div class="k">Итого: собственный + партнёрский</div><div class="v" id="grandTotal">—</div></div>
+    </div>
+    <div class="note" id="affPerMonth">В среднем в месяц: —</div>
   </div>
 </div>
-
-<!-- Inline tiny chart renderer -->
-<script>
-(function(global){
-  function Legend(ctx, labels, colors, x, y){
-    ctx.font = "12px Arial"; ctx.textBaseline = "middle";
-    let off = 0; labels.forEach((lab, idx)=>{ const col = colors[idx % colors.length]; ctx.fillStyle = col; ctx.fillRect(x+off, y-6, 12, 12); ctx.fillStyle = "#cfeaff"; ctx.fillText(lab, x+off+16, y); off += ctx.measureText(lab).width + 36; });
-  }
-  function scale(arr){ let min = Math.min.apply(null, arr), max = Math.max.apply(null, arr); if(min===max){max=min+1;} return {min, max}; }
-  class Chart{
-    constructor(ctx, config){ this.ctx = ctx; this.config = JSON.parse(JSON.stringify(config||{})); this._destroyed=false; this.draw(); }
-    destroy(){ this._destroyed=true; this.ctx=null; this.config=null; }
-    update(){ this.draw(); }
-    draw(){
-      if(this._destroyed) return;
-      const c = this.ctx.canvas; const ctx = this.ctx; const dpr = window.devicePixelRatio || 1;
-      c.width = c.clientWidth * dpr; c.height = c.clientHeight * dpr; ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,c.clientWidth,c.clientHeight);
-      const padding = {left:56, right:20, top:32, bottom:28}; const W = c.clientWidth, H = c.clientHeight; const areaW = W - padding.left - padding.right; const areaH = H - padding.top - padding.bottom;
-      const labels = (this.config.data && this.config.data.labels) || []; const datasets = (this.config.data && this.config.data.datasets) || [];
-      ctx.strokeStyle = "rgba(160,200,255,.25)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(padding.left, padding.top); ctx.lineTo(padding.left, H - padding.bottom); ctx.lineTo(W - padding.right, H - padding.bottom); ctx.stroke();
-      const all = []; datasets.forEach(ds=> (ds.data||[]).forEach(v=> { if(isFinite(v)) all.push(v); })); const ys = scale(all.length? all: [0,1]); const yMin = Math.min(0, ys.min); const yMax = ys.max*1.1;
-      function xPos(i){ if(labels.length<=1){ return padding.left + areaW*0.05 + i*30; } const t = i/(labels.length-1); return padding.left + t*areaW; }
-      function yPos(v){ const t = (v - yMin)/Math.max(1e-9, (yMax - yMin)); return (H - padding.bottom) - t*areaH; }
-      ctx.fillStyle = "#9fb7ff"; ctx.font = "12px Arial"; for(let ti=0; ti<=5; ti++){ const v = yMin + (yMax-yMin)*ti/5; const y = yPos(v); ctx.strokeStyle = "rgba(160,200,255,.12)"; ctx.beginPath(); ctx.moveTo(padding.left, y); ctx.lineTo(W - padding.right, y); ctx.stroke(); ctx.fillText(v.toLocaleString(undefined,{maximumFractionDigits:0}), 8, y); }
-      const palette = ["#6ec1ff","#ff8ea1","#8effa4","#f8d47b","#caa0ff","#73e3e8"]; const groupW = (labels.length? areaW/labels.length : 50);
-      datasets.forEach((ds, di)=>{
-        const col = ds.color || palette[di%palette.length];
-        if((this.config.type||"line")==="line"){
-          ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.beginPath(); (ds.data||[]).forEach((v, i)=>{ const x = xPos(i), y = yPos(v); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }); ctx.stroke();
-          if(ds.fill){ const base = yPos(0); ctx.lineTo(xPos((ds.data||[]).length-1), base); ctx.lineTo(xPos(0), base); ctx.closePath(); ctx.fillStyle = col+"33"; ctx.fill(); }
-        } else if(this.config.type==="bar"){
-          const barsPerGroup = Math.max(1, datasets.length); const bw = groupW * 0.7 / barsPerGroup;
-          (ds.data||[]).forEach((v, i)=>{ const center = xPos(i); const x = center - (groupW*0.35) + di*bw; const y = yPos(v); const base = yPos(0); ctx.fillStyle = col; ctx.fillRect(x, Math.min(y, base), bw, Math.abs(base - y)); if(ds.showValues){ ctx.fillStyle="#d7eaff"; ctx.font="11px Arial"; ctx.textAlign="center"; ctx.fillText(((v||0)).toLocaleString(undefined,{maximumFractionDigits:0}), x + bw/2, y-6); } });
-        }
-      });
-      Legend(ctx, datasets.map(d=>d.label||""), palette, padding.left, 14);
-    }
-  }
-  global.Chart = Chart;
-})(this);
-</script>
 
 <script>
 const $ = s => document.querySelector(s);
 const i = id => document.getElementById(id);
+
 function lcm(a,b){const g=(x,y)=>y===0?x:g(y,x%y);return a*b/g(a,b)}
 function fmt(sym,n){return sym+' '+(+n).toLocaleString(undefined,{maximumFractionDigits:2})}
 function clamp(x,minv,maxv){return Math.max(minv, Math.min(maxv, x));}
 
-function simulate(params){
-  const {initial,contrib,contribFreq,rate,fee,infl,compound,years,timing} = params;
-  const n = Math.max(1, Math.floor(compound));
-  const m = Math.max(0, Math.floor(contribFreq));
+function simulate(p){
+  const n = Math.max(1, Math.floor(p.compound));
+  const m = Math.max(0, Math.floor(p.contribFreq));
   const steps = (m===0? n : lcm(n,m));
   const compoundEvery = steps/n;
   const contribEvery = (m===0? Infinity : steps/m);
-  const rNet = (rate - fee)/100;
-  let bal = +initial||0, totalC=0, invested=+initial||0;
+  const rNet = (p.rate - p.fee)/100;
+  let bal = +p.initial||0, totalC=0, invested=+p.initial||0;
   const yearly=[], investedYearly=[];
-  for(let y=1; y<=years; y++){
+  for(let y=1; y<=p.years; y++){
     for(let s=1;s<=steps;s++){
-      if(timing==='begin' && ((s-1)%contribEvery===0) && params.contrib>0){ bal+=+params.contrib; totalC+=+params.contrib; invested+=+params.contrib; }
+      if(p.timing==='begin' && ((s-1)%contribEvery===0) && p.contrib>0){ bal+=+p.contrib; totalC+=+p.contrib; invested+=+p.contrib; }
       if(s%compoundEvery===0){ bal *= 1 + (rNet/n); }
-      if(timing==='end' && (s%contribEvery===0) && params.contrib>0){ bal+=+params.contrib; totalC+=+params.contrib; invested+=+params.contrib; }
+      if(p.timing==='end' && (s%contribEvery===0) && p.contrib>0){ bal+=+p.contrib; totalC+=+p.contrib; invested+=+p.contrib; }
     }
-    const real = infl>0 ? bal/Math.pow(1+infl/100,y) : bal;
+    const real = p.infl>0 ? bal/Math.pow(1+p.infl/100,y) : bal;
     yearly.push({year:y,balance:bal,real:+real.toFixed(2)});
     investedYearly.push(invested);
   }
   const ear = Math.pow(1 + (rNet/n), n) - 1;
-  return {final:bal,totalC,interest:bal-(+initial+totalC),yearly,investedYearly,ear};
+  return {final:bal,interest:bal-(+p.initial+totalC),yearly,investedYearly,ear};
 }
 
 let chart=null, affChart=null;
@@ -221,63 +245,106 @@ function getParams(){
   };
 }
 
+function shareURL(){
+  const p=getParams(); const u=new URL(location.href.split('?')[0]);
+  Object.entries(p).forEach(([k,v])=>u.searchParams.set(k,String(v)));
+  history.replaceState(null,'',u.toString());
+  return u.toString();
+}
+
 function render(){
   const p=getParams();
-  const isMonthly=(p.mode==='monthly');
-  if(isMonthly){
+  if(p.mode==='monthly'){
     const m=(p.mrate||0)/100, d=Math.max(0,(p.mvol||0)/100);
     const ear=Math.pow(1+m,12)-1;
     const lo=Math.pow(1+clamp(m-d,-0.99,10),12)-1;
     const hi=Math.pow(1+clamp(m+d,-0.99,10),12)-1;
-    i('earFromMonthly').textContent=(ear*100).toFixed(2)+'% ('+(lo*100).toFixed(1)+'%…'+(hi*100).toFixed(1)+'%)';
+    const el=document.getElementById('earFromMonthly'); if(el) el.textContent=(ear*100).toFixed(2)+'% ('+(lo*100).toFixed(1)+'%…'+(hi*100).toFixed(1)+'%)';
     p.rate=ear*100;
+    document.getElementById('annualBox').style.display='none';
+    document.getElementById('monthlyBox').style.display='grid';
+  }else{
+    document.getElementById('annualBox').style.display='grid';
+    document.getElementById('monthlyBox').style.display='none';
   }
-  i('annualBox').style.display=isMonthly?'none':'';
-  i('monthlyBox').style.display=isMonthly?'':'none';
 
   const r=simulate(p);
   const contributed = (p.contribFreq>0? p.years*p.contribFreq:0)*p.contrib;
-  i('tcontrib').textContent=fmt(p.currency, contributed);
-  i('tinterest').textContent=fmt(p.currency, r.interest);
-  i('earVal').textContent=(r.ear*100).toFixed(2)+'%';
-  const tb=i('tbody'); tb.innerHTML='';
+  document.getElementById('tcontrib').textContent=fmt(p.currency, contributed);
+  document.getElementById('tinterest').textContent=fmt(p.currency, r.interest);
+  document.getElementById('earVal').textContent=(r.ear*100).toFixed(2)+'%';
+
+  const tb=document.getElementById('tbody'); tb.innerHTML='';
   r.yearly.forEach(y=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${y.year}</td><td>${fmt(p.currency,y.balance)}</td><td>${fmt(p.currency,y.real)}</td>`; tb.appendChild(tr); });
 
   const labels=r.yearly.map(y=>y.year);
   const balances=r.yearly.map(y=>y.balance);
   const invested=r.investedYearly;
-  const ctx=i('chart').getContext('2d'); if(chart) chart.destroy();
-  chart=new Chart(ctx,{type:'line', data:{labels, datasets:[{label:'Внесено',data:invested,fill:true},{label:'Итог',data:balances,fill:false}]}});
+  const ctx=document.getElementById('chart').getContext('2d'); if(chart) chart.destroy();
+  chart=new Chart(ctx,{type:'line', data:{labels, datasets:[{label:'Внесено',data:invested,fill:true,color:'#6ec1ff'},{label:'Итог',data:balances,fill:false,color:'#f8d47b'}]}});
 
-  // Партнёрка: расчёт L1-L4
-  const l1=p.affL1, l2=p.affL2, l3=p.affL3, l4=p.affL4;
-  const avg=Math.max(0,p.affAvg);
+  // partner incomes
+  const l1=p.affL1,l2=p.affL2,l3=p.affL3,l4=p.affL4, avg=Math.max(0,p.affAvg);
   const l1Mon=p.affOn? avg*(0.05*l1):0, l2Mon=p.affOn? avg*(0.08*l2):0, l3Mon=p.affOn? avg*(0.10*l3):0, l4Mon=p.affOn? avg*(0.02*l4):0;
-  i('affL1Mon').textContent=fmt(p.currency,l1Mon); i('affL2Mon').textContent=fmt(p.currency,l2Mon); i('affL3Mon').textContent=fmt(p.currency,l3Mon); i('affL4Mon').textContent=fmt(p.currency,l4Mon);
+  document.getElementById('affL1Mon').textContent=fmt(p.currency,l1Mon);
+  document.getElementById('affL2Mon').textContent=fmt(p.currency,l2Mon);
+  document.getElementById('affL3Mon').textContent=fmt(p.currency,l3Mon);
+  document.getElementById('affL4Mon').textContent=fmt(p.currency,l4Mon);
+
   const labelsL=['L1','L2','L3','L4'];
-  const Dm=[l1Mon,l2Mon,l3Mon,l4Mon]; const D1=Dm.map(v=>v*12), D2=Dm.map(v=>v*24), D3=Dm.map(v=>v*36);
-  const ac=i('affChart').getContext('2d'); if(affChart) affChart.destroy();
+  const Dm=[l1Mon,l2Mon,l3Mon,l4Mon];
+  const ac=document.getElementById('affChart').getContext('2d'); if(affChart) affChart.destroy();
   affChart=new Chart(ac,{type:'bar', data:{labels:labelsL, datasets:[
     {label:'Месяц', data:Dm, color:'#6ec1ff', showValues:true},
-    {label:'1 год', data:D1, color:'#ff8ea1', showValues:true},
-    {label:'2 года', data:D2, color:'#8effa4', showValues:true},
-    {label:'3 года', data:D3, color:'#f8d47b', showValues:true},
+    {label:'1 год', data:Dm.map(v=>v*12), color:'#ff8ea1', showValues:true},
+    {label:'2 года', data:Dm.map(v=>v*24), color:'#8effa4', showValues:true},
+    {label:'3 года', data:Dm.map(v=>v*36), color:'#f8d47b', showValues:true},
   ]}});
+
+  const affIncome=p.affOn? p.affMonths*(Dm[0]+Dm[1]+Dm[2]+Dm[3]):0;
+  const ownIncome=(p.initial>=3000)? Math.max(0, r.interest*0.5):0;
+  const grand=ownIncome+affIncome;
+  document.getElementById('ownShare').textContent=fmt(p.currency,ownIncome);
+  document.getElementById('affTotal').textContent=fmt(p.currency,affIncome);
+  document.getElementById('grandTotal').textContent=fmt(p.currency,grand);
+  document.getElementById('affPerMonth').textContent='В среднем в месяц: '+fmt(p.currency, grand/Math.max(1,p.affMonths));
 }
 
 function bind(){
-  const ids=['modeAnnual','modeMonthly','rate','fee','infl','compound','mrate','mvol','initial','contrib','contribFreq','years','timing','currency','affOn','affAvg','affMonths','affL1','affL2','affL3','affL4'];
-  ids.forEach(id=>{ const el=i(id); if(!el) return; el.addEventListener('input',render); el.addEventListener('change',render); });
-  i('btnReset').addEventListener('click', ()=>{ location.href = location.pathname; });
-  i('btnShare').addEventListener('click', ()=>{ const u=new URL(location.href.split('?')[0]); Object.entries(getParams()).forEach(([k,v])=>u.searchParams.set(k,String(v))); history.replaceState(null,'',u.toString()); navigator.clipboard&&navigator.clipboard.writeText(u.toString()); alert('Ссылка скопирована'); });
-  i('btnPNG').addEventListener('click', ()=>{ const a=document.createElement('a'); a.href=document.querySelector('canvas').toDataURL('image/png'); a.download='zeus_calc.png'; a.click(); });
-  i('btnPDF').addEventListener('click', ()=>window.print());
-  i('btnCSV').addEventListener('click', ()=>{
-    const p=getParams(); const r=simulate(p); const rows=[['Год','Баланс','Реально (с инфл.)']]; r.yearly.forEach(y=>rows.push([y.year,y.balance,y.real]));
-    rows.push([]); rows.push(['L','Месяц','1 год','2 года','3 года']); const Dm=[p.affAvg*(0.05*p.affL1),p.affAvg*(0.08*p.affL2),p.affAvg*(0.10*p.affL3),p.affAvg*(0.02*p.affL4)];
+  ['modeAnnual','modeMonthly','rate','fee','infl','compound','mrate','mvol','initial','contrib','contribFreq','years','timing','currency','affOn','affAvg','affMonths','affL1','affL2','affL3','affL4']
+    .forEach(id=>{ const el=document.getElementById(id); if(el){ el.addEventListener('input',render); el.addEventListener('change',render);} });
+  document.getElementById('btnReset').addEventListener('click', ()=>{ location.href = location.pathname; });
+  document.getElementById('btnShare').addEventListener('click', ()=>{ const url=shareURL(); navigator.clipboard&&navigator.clipboard.writeText(url); alert('Ссылка скопирована'); });
+  document.getElementById('btnPNG').addEventListener('click', ()=>{ const a=document.createElement('a'); a.href=document.querySelector('canvas').toDataURL('image/png'); a.download='zeus_calc.png'; a.click(); });
+  document.getElementById('btnPDF').addEventListener('click', ()=>window.print());
+  document.getElementById('btnCSV').addEventListener('click', ()=>{
+    const p=getParams(); const r=simulate(p);
+    const rows=[['Год','Баланс','Реально (с инфл.)']];
+    r.yearly.forEach(y=>rows.push([y.year,y.balance,y.real]));
+    rows.push([]); rows.push(['L','Месяц','1 год','2 года','3 года']);
+    const Dm=[p.affAvg*(0.05*p.affL1),p.affAvg*(0.08*p.affL2),p.affAvg*(0.10*p.affL3),p.affAvg*(0.02*p.affL4)];
     [['L1',0],['L2',1],['L3',2],['L4',3]].forEach(([k,idx])=> rows.push([k, Dm[idx], Dm[idx]*12, Dm[idx]*24, Dm[idx]*36]));
-    const csv=rows.map(r=> r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n'); const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download='zeus_calc.csv'; a.click();
+    const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download='zeus_calc.csv'; a.click();
   });
+}
+function getParams(){
+  return {
+    initial:+document.getElementById('initial').value||0,
+    contrib:+document.getElementById('contrib').value||0,
+    contribFreq:+document.getElementById('contribFreq').value||0,
+    rate:+document.getElementById('rate').value||0,
+    fee:+document.getElementById('fee').value||0,
+    infl:+document.getElementById('infl').value||0,
+    compound:+document.getElementById('compound').value||0,
+    years:+document.getElementById('years').value||0,
+    timing:document.getElementById('timing').value,
+    currency:document.getElementById('currency').value,
+    mode:document.getElementById('modeMonthly').checked?'monthly':'annual',
+    mrate:+(document.getElementById('mrate')?document.getElementById('mrate').value:0)||0,
+    mvol:+(document.getElementById('mvol')?document.getElementById('mvol').value:0)||0,
+    affOn:document.getElementById('affOn').checked, affAvg:+document.getElementById('affAvg').value||0, affMonths:+document.getElementById('affMonths').value||0, affL1:+document.getElementById('affL1').value||0, affL2:+document.getElementById('affL2').value||0, affL3:+document.getElementById('affL3').value||0, affL4:+document.getElementById('affL4').value||0
+  };
 }
 
 bind(); render();
