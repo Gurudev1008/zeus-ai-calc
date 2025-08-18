@@ -3,9 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ZEUS AI — Калькулятор сложных процентов</title>
+<title>ZEUS AI — Калькулятор сложных процентов (Single File)</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%2338e8ff' d='M28 4l-6 20h10l-8 28 20-26H34l10-22z'/%3E%3C/svg%3E">
-<script src="./assets/js/chartjs-official/chart.umd.min.js"></script>
 <style>
 :root{--bg:#08142f;--panel:#0e1d3f;--text:#d7eaff;--muted:#9fb7ff;--cyan:#38e8ff;--border:#38e8ff33;--hl:#12305e}
 *{box-sizing:border-box}
@@ -33,6 +32,7 @@ table{width:100%;border-collapse:collapse;margin-top:6px}th,td{border-bottom:1px
 canvas{width:100%;height:340px}
 .i{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:6px;border-radius:50%;border:1px solid var(--border);color:#9bdfff;font-size:12px;cursor:help;position:relative}
 .i:hover::after{content:attr(data-tip);position:absolute;left:20px;top:-4px;min-width:220px;max-width:360px;background:#0a1840;color:#cfeaff;border:1px solid var(--border);padding:8px 10px;border-radius:10px;white-space:normal;z-index:10}
+@media print{.topbar{display:none}}
 </style>
 </head>
 <body>
@@ -40,12 +40,11 @@ canvas{width:100%;height:340px}
   <div class="topbar">
     <h1>Калькулятор сложных процентов</h1>
     <div class="menu">
-      <button class="btn" id="btnReset" title="Сбросить все поля к значениям по умолчанию">Сброс</button>
-      <button class="btn" id="btnHelp" title="Поясняющая инструкция и формулы">Инструкция</button>
-      <button class="btn" id="btnShare" title="Сформировать ссылку с параметрами текущего расчёта">Поделиться</button>
-      <button class="btn" id="btnPNG" title="Скачать общий PNG с графиком и KPI">PNG</button>
-      <button class="btn" id="btnPDF" title="Экспорт в PDF через диалог печати">PDF</button>
-      <button class="btn" id="btnCSV" title="Скачать CSV с таблицей и партнёркой">CSV</button>
+      <button class="btn" id="btnReset">Сброс</button>
+      <button class="btn" id="btnShare">Поделиться</button>
+      <button class="btn" id="btnPNG">PNG</button>
+      <button class="btn" id="btnPDF">PDF</button>
+      <button class="btn" id="btnCSV">CSV</button>
     </div>
   </div>
 
@@ -63,29 +62,29 @@ canvas{width:100%;height:340px}
         </div>
         <div id="monthlyBox" class="row two" style="margin-top:8px;display:none">
           <label>Месячная ставка, % <span class="i" data-tip="Средняя доходность за месяц (m). Конвертируется в годовую EAR как (1+m)^12-1.">i</span><input type="number" id="mrate" value="2" step="0.001"></label>
-          <label>Колебания, ±% <span class="i" data-tip="Диапазон отклонений месячной доходности для подсказки по нижней/верхней годовой.">i</span><input type="number" id="mvol" value="0" step="0.01"></label>
+          <label>Колебания, ±% <span class="i" data-tip="Диапазон отклонений месячной доходности.">i</span><input type="number" id="mvol" value="0" step="0.01"></label>
           <div class="hint">Годовая EAR из месячной: <b id="earFromMonthly">—</b></div>
         </div>
         <div class="row two">
-          <label>Первоначальная сумма <span class="i" data-tip="Депозит на старте периода. Если ≥ $3k — активируется собственный доход 50% от прибыли.">i</span><input type="number" id="initial" value="3000" step="1" min="0"></label>
-          <label>Регулярное пополнение <span class="i" data-tip="Фиксированная сумма, вносимая каждый период (см. частоту слева).">i</span><input type="number" id="contrib" value="0" step="1" min="0"></label>
+          <label>Первоначальная сумма <span class="i" data-tip="Стартовый депозит. ≥ $3k — включается собственный доход 50% от прибыли.">i</span><input type="number" id="initial" value="3000" step="1" min="0"></label>
+          <label>Регулярное пополнение <span class="i" data-tip="Сумма каждого взноса.">i</span><input type="number" id="contrib" value="0" step="1" min="0"></label>
         </div>
         <div class="row two">
-          <label>Частота пополнений <span class="i" data-tip="Сколько раз в год вносите регулярное пополнение. 0 — без пополнений.">i</span><select id="contribFreq"><option value="12" selected>Ежемесячно (12)</option><option value="4">Ежеквартально (4)</option><option value="1">Ежегодно (1)</option><option value="0">Без пополнений</option></select></label>
-          <label>Капитализация <span class="i" data-tip="Как часто начисляются проценты в год. Влияет на эффективную годовую (EAR).">i</span><select id="compound"><option value="12" selected>Ежемесячно (12)</option><option value="4">Ежеквартально (4)</option><option value="1">Ежегодно (1)</option></select></label>
+          <label>Частота пополнений <span class="i" data-tip="Сколько раз в год. 0 — без пополнений.">i</span><select id="contribFreq"><option value="12" selected>Ежемесячно (12)</option><option value="4">Ежеквартально (4)</option><option value="1">Ежегодно (1)</option><option value="0">Без пополнений</option></select></label>
+          <label>Капитализация <span class="i" data-tip="Как часто начисляются проценты в год.">i</span><select id="compound"><option value="12" selected>Ежемесячно (12)</option><option value="4">Ежеквартально (4)</option><option value="1">Ежегодно (1)</option></select></label>
         </div>
         <div class="row two">
-          <label>Срок, лет <span class="i" data-tip="Количество лет моделирования. Таблица и график строятся по годам.">i</span><input type="number" id="years" value="3" step="1" min="1"></label>
-          <label>Инфляция, % <span class="i" data-tip="Сглаженно учитывается для столбца «Реально (с инфляцией)».">i</span><input type="number" id="infl" value="0" step="0.01"></label>
+          <label>Срок, лет <span class="i" data-tip="Сколько лет моделируем.">i</span><input type="number" id="years" value="3" step="1" min="1"></label>
+          <label>Инфляция, % <span class="i" data-tip="Используется для столбца «Реально (с инфляцией)».">i</span><input type="number" id="infl" value="0" step="0.01"></label>
         </div>
         <div class="row two">
-          <label>Момент пополнения <span class="i" data-tip="«В начале» — деньги в работе весь период; «В конце» — только со следующего.">i</span><select id="timing"><option value="begin" selected>В начале периода</option><option value="end">В конце периода</option></select></label>
-          <label>Валюта <span class="i" data-tip="Символ валюты только для отображения. Расчёты без конвертации.">i</span><select id="currency"><option value="$" selected>$</option><option value="€">€</option><option value="₽">₽</option></select></label>
+          <label>Момент пополнения <span class="i" data-tip="В начале — деньги в работе сразу; в конце — со следующего периода.">i</span><select id="timing"><option value="begin" selected>В начале периода</option><option value="end">В конце периода</option></select></label>
+          <label>Валюта <span class="i" data-tip="Только символ в интерфейсе.">i</span><select id="currency"><option value="$" selected>$</option><option value="€">€</option><option value="₽">₽</option></select></label>
         </div>
         <div class="kpi">
-          <div class="mini"><div class="label">Внесено, всего <span class="i" data-tip="Сумма всех регулярных пополнений за период (без стартового депозита).">i</span></div><div class="value" id="tcontrib">—</div></div>
+          <div class="mini"><div class="label">Внесено, всего <span class="i" data-tip="Все регулярные взносы за период (без старта).">i</span></div><div class="value" id="tcontrib">—</div></div>
           <div class="mini"><div class="label">Начислено процентов <span class="i" data-tip="Финальный баланс минус все внесения и старт.">i</span></div><div class="value" id="tinterest">—</div></div>
-          <div class="mini"><div class="label">EAR (эффективная годовая) <span class="i" data-tip="(1 + r_net/n)^n − 1, где r_net = (ставка − комиссия)/100.">i</span></div><div class="value" id="earVal">—</div></div>
+          <div class="mini"><div class="label">EAR (эффективная годовая) <span class="i" data-tip="(1 + r_net/n)^n − 1, r_net = (ставка − комиссия)/100.">i</span></div><div class="value" id="earVal">—</div></div>
         </div>
       </div>
     </div>
@@ -103,29 +102,17 @@ canvas{width:100%;height:340px}
   <div class="card">
     <div class="ctitle"><h3>Партнёрская программа (копитрейдинг)</h3><span class="pill">Доход от сети</span></div>
     <div class="fields">
-      <label><input type="checkbox" id="affOn" checked> Учитывать партнёрские вознаграждения <span class="i" data-tip="Если выключить — вся партнёрка = 0.">i</span></label>
-      <div class="hint">Ваш доход: <b>50% от собственной прибыли</b>. Уровни: L1 5%, L2 8%, L3 10%, L4 2%. Открываются: 1–2 ≥ $3k, 3 ≥ $10k, 4 ≥ $20k.</div>
+      <label><input type="checkbox" id="affOn" checked> Учитывать партнёрские вознаграждения</label>
       <div class="row two">
-        <label>Средняя прибыль партнёра в месяц <span class="i" data-tip="Средняя чистая прибыль одного подключённого инвестора за месяц.">i</span><input type="number" id="affAvg" value="200" step="1" min="0"></label>
-        <label>Месяцев учёта <span class="i" data-tip="На сколько месяцев считается партнёрский доход.">i</span><input type="number" id="affMonths" value="48" step="1" min="1"></label>
+        <label>Средняя прибыль партнёра в месяц<input type="number" id="affAvg" value="200" step="1" min="0"></label>
+        <label>Месяцев учёта<input type="number" id="affMonths" value="48" step="1" min="1"></label>
       </div>
       <div class="affGrid">
-        <label>Партнёров 1-го уровня <span class="i" data-tip="Личные подключения. Вознаграждение 5% от их прибыли.">i</span><input type="number" id="affL1" value="20" min="0"></label>
-        <label>Партнёров 2-го уровня <span class="i" data-tip="Подключения ваших L1. Вознаграждение 8%.">i</span><input type="number" id="affL2" value="50" min="0"></label>
-        <label>Партнёров 3-го уровня <span class="i" data-tip="Вознаграждение 10% от прибыли их депозитов.">i</span><input type="number" id="affL3" value="100" min="0"></label>
-        <label>Партнёров 4-го уровня <span class="i" data-tip="Вознаграждение 2%.">i</span><input type="number" id="affL4" value="300" min="0"></label>
+        <label>Партнёров 1-го уровня<input type="number" id="affL1" value="20" min="0"></label>
+        <label>Партнёров 2-го уровня<input type="number" id="affL2" value="50" min="0"></label>
+        <label>Партнёров 3-го уровня<input type="number" id="affL3" value="100" min="0"></label>
+        <label>Партнёров 4-го уровня<input type="number" id="affL4" value="300" min="0"></label>
       </div>
-
-      <label style="margin-top:8px"><input type="checkbox" id="affAuto"> Считать среднюю прибыль партнёра автоматически <span class="i" data-tip="По распределению депозитов: $3k/$10k/$20k и текущей месячной доходности.">i</span></label>
-      <div id="affAutoBox" style="display:none">
-        <div class="row three">
-          <label>% с депозитом $3,000<input type="number" id="affP3k" value="60" min="0" max="100" step="1"></label>
-          <label>% с депозитом $10,000<input type="number" id="affP10k" value="30" min="0" max="100" step="1"></label>
-          <label>% с депозитом $20,000<input type="number" id="affP20k" value="10" min="0" max="100" step="1"></label>
-        </div>
-        <div class="hint" id="affAutoHint">Итоговое распределение: 60% / 30% / 10%. Средняя прибыль: —</div>
-      </div>
-
       <div class="kpi">
         <div class="mini"><div class="label">Месячная прибыль L1</div><div class="value" id="affL1Mon">—</div></div>
         <div class="mini"><div class="label">Месячная прибыль L2</div><div class="value" id="affL2Mon">—</div></div>
@@ -133,19 +120,54 @@ canvas{width:100%;height:340px}
         <div class="mini"><div class="label">Месячная прибыль L4</div><div class="value" id="affL4Mon">—</div></div>
       </div>
 
-      <div class="kpi">
-        <div class="mini"><div class="label">Собственный доход (50% процентов)</div><div class="value" id="ownShare">—</div><div class="hint">Работает при депозите ≥ $3,000</div></div>
-        <div class="mini"><div class="label">Партнёрский доход за период</div><div class="value" id="affTotal">—</div><div class="hint" id="affLevelsHint">Уровни: —</div></div>
-        <div class="mini"><div class="label">Итого: собственный + партнёрский</div><div class="value" id="grandTotal">—</div><div class="hint" id="affPerMonth">В среднем в месяц: —</div></div>
-      </div>
-
       <div class="card" style="background:rgba(255,255,255,.03);margin-top:10px">
-        <h4 style="margin:6px 0 8px">Диаграмма партнёрской прибыли <span class="i" data-tip="Столбцы по уровням L1–L4: прибыль за 1 месяц, 1 год, 2 года, 3 года — разными цветами и с подписями сверху.">i</span></h4>
+        <h4 style="margin:6px 0 8px">Диаграмма партнёрской прибыли</h4>
         <canvas id="affChart"></canvas>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Inline tiny chart renderer -->
+<script>
+(function(global){
+  function Legend(ctx, labels, colors, x, y){
+    ctx.font = "12px Arial"; ctx.textBaseline = "middle";
+    let off = 0; labels.forEach((lab, idx)=>{ const col = colors[idx % colors.length]; ctx.fillStyle = col; ctx.fillRect(x+off, y-6, 12, 12); ctx.fillStyle = "#cfeaff"; ctx.fillText(lab, x+off+16, y); off += ctx.measureText(lab).width + 36; });
+  }
+  function scale(arr){ let min = Math.min.apply(null, arr), max = Math.max.apply(null, arr); if(min===max){max=min+1;} return {min, max}; }
+  class Chart{
+    constructor(ctx, config){ this.ctx = ctx; this.config = JSON.parse(JSON.stringify(config||{})); this._destroyed=false; this.draw(); }
+    destroy(){ this._destroyed=true; this.ctx=null; this.config=null; }
+    update(){ this.draw(); }
+    draw(){
+      if(this._destroyed) return;
+      const c = this.ctx.canvas; const ctx = this.ctx; const dpr = window.devicePixelRatio || 1;
+      c.width = c.clientWidth * dpr; c.height = c.clientHeight * dpr; ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,c.clientWidth,c.clientHeight);
+      const padding = {left:56, right:20, top:32, bottom:28}; const W = c.clientWidth, H = c.clientHeight; const areaW = W - padding.left - padding.right; const areaH = H - padding.top - padding.bottom;
+      const labels = (this.config.data && this.config.data.labels) || []; const datasets = (this.config.data && this.config.data.datasets) || [];
+      ctx.strokeStyle = "rgba(160,200,255,.25)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(padding.left, padding.top); ctx.lineTo(padding.left, H - padding.bottom); ctx.lineTo(W - padding.right, H - padding.bottom); ctx.stroke();
+      const all = []; datasets.forEach(ds=> (ds.data||[]).forEach(v=> { if(isFinite(v)) all.push(v); })); const ys = scale(all.length? all: [0,1]); const yMin = Math.min(0, ys.min); const yMax = ys.max*1.1;
+      function xPos(i){ if(labels.length<=1){ return padding.left + areaW*0.05 + i*30; } const t = i/(labels.length-1); return padding.left + t*areaW; }
+      function yPos(v){ const t = (v - yMin)/Math.max(1e-9, (yMax - yMin)); return (H - padding.bottom) - t*areaH; }
+      ctx.fillStyle = "#9fb7ff"; ctx.font = "12px Arial"; for(let ti=0; ti<=5; ti++){ const v = yMin + (yMax-yMin)*ti/5; const y = yPos(v); ctx.strokeStyle = "rgba(160,200,255,.12)"; ctx.beginPath(); ctx.moveTo(padding.left, y); ctx.lineTo(W - padding.right, y); ctx.stroke(); ctx.fillText(v.toLocaleString(undefined,{maximumFractionDigits:0}), 8, y); }
+      const palette = ["#6ec1ff","#ff8ea1","#8effa4","#f8d47b","#caa0ff","#73e3e8"]; const groupW = (labels.length? areaW/labels.length : 50);
+      datasets.forEach((ds, di)=>{
+        const col = ds.color || palette[di%palette.length];
+        if((this.config.type||"line")==="line"){
+          ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.beginPath(); (ds.data||[]).forEach((v, i)=>{ const x = xPos(i), y = yPos(v); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }); ctx.stroke();
+          if(ds.fill){ const base = yPos(0); ctx.lineTo(xPos((ds.data||[]).length-1), base); ctx.lineTo(xPos(0), base); ctx.closePath(); ctx.fillStyle = col+"33"; ctx.fill(); }
+        } else if(this.config.type==="bar"){
+          const barsPerGroup = Math.max(1, datasets.length); const bw = groupW * 0.7 / barsPerGroup;
+          (ds.data||[]).forEach((v, i)=>{ const center = xPos(i); const x = center - (groupW*0.35) + di*bw; const y = yPos(v); const base = yPos(0); ctx.fillStyle = col; ctx.fillRect(x, Math.min(y, base), bw, Math.abs(base - y)); if(ds.showValues){ ctx.fillStyle="#d7eaff"; ctx.font="11px Arial"; ctx.textAlign="center"; ctx.fillText(((v||0)).toLocaleString(undefined,{maximumFractionDigits:0}), x + bw/2, y-6); } });
+        }
+      });
+      Legend(ctx, datasets.map(d=>d.label||""), palette, padding.left, 14);
+    }
+  }
+  global.Chart = Chart;
+})(this);
+</script>
 
 <script>
 const $ = s => document.querySelector(s);
@@ -170,7 +192,7 @@ function simulate(params){
       if(s%compoundEvery===0){ bal *= 1 + (rNet/n); }
       if(timing==='end' && (s%contribEvery===0) && params.contrib>0){ bal+=+params.contrib; totalC+=+params.contrib; invested+=+params.contrib; }
     }
-    const real = params.infl>0 ? bal/Math.pow(1+params.infl/100,y) : bal;
+    const real = infl>0 ? bal/Math.pow(1+infl/100,y) : bal;
     yearly.push({year:y,balance:bal,real:+real.toFixed(2)});
     investedYearly.push(invested);
   }
@@ -195,8 +217,7 @@ function getParams(){
     mode:i('modeMonthly').checked?'monthly':'annual',
     mrate:+i('mrate')?.value||0,
     mvol:+i('mvol')?.value||0,
-    affOn:i('affOn').checked, affAvg:+i('affAvg').value||0, affMonths:+i('affMonths').value||0, affL1:+i('affL1').value||0, affL2:+i('affL2').value||0, affL3:+i('affL3').value||0, affL4:+i('affL4').value||0,
-    affAuto:i('affAuto').checked, affP3k:+i('affP3k').value||0, affP10k:+i('affP10k').value||0, affP20k:+i('affP20k').value||0
+    affOn:i('affOn').checked, affAvg:+i('affAvg').value||0, affMonths:+i('affMonths').value||0, affL1:+i('affL1').value||0, affL2:+i('affL2').value||0, affL3:+i('affL3').value||0, affL4:+i('affL4').value||0
   };
 }
 
@@ -228,64 +249,34 @@ function render(){
   const ctx=i('chart').getContext('2d'); if(chart) chart.destroy();
   chart=new Chart(ctx,{type:'line', data:{labels, datasets:[{label:'Внесено',data:invested,fill:true},{label:'Итог',data:balances,fill:false}]}});
 
-  // Партнёрка: месячная и мульти-горизонты (с подписями)
-  const dep=p.initial; const lvl1Open=dep>=3000, lvl2Open=dep>=3000, lvl3Open=dep>=10000, lvl4Open=dep>=20000;
-  let avg=Math.max(0,p.affAvg);
-  if(p.affAuto){
-    const mEff=Math.pow(1+r.ear,1/12)-1;
-    const w3=Math.max(0,p.affP3k), w10=Math.max(0,p.affP10k), w20=Math.max(0,p.affP20k);
-    const sum=Math.max(1,w3+w10+w20);
-    avg=(w3/sum)*(3000*mEff)+(w10/sum)*(10000*mEff)+(w20/sum)*(20000*mEff);
-    i('affAutoHint').textContent=`Распределение: ${(w3/sum*100).toFixed(0)}% / ${(w10/sum*100).toFixed(0)}% / ${(w20/sum*100).toFixed(0)}%. Месячная доходность ≈ ${(mEff*100).toFixed(2)}%. Средняя прибыль партнёра: ${fmt(p.currency, avg)} в месяц.`;
-  }
-  const L=[(lvl1Open?p.affL1:0),(lvl2Open?p.affL2:0),(lvl3Open?p.affL3:0),(lvl4Open?p.affL4:0)];
-  const R=[0.05,0.08,0.10,0.02];
-  const Dm=L.map((n,i)=> (p.affOn? avg*(R[i]*n):0));
+  // Партнёрка: расчёт L1-L4
+  const l1=p.affL1, l2=p.affL2, l3=p.affL3, l4=p.affL4;
+  const avg=Math.max(0,p.affAvg);
+  const l1Mon=p.affOn? avg*(0.05*l1):0, l2Mon=p.affOn? avg*(0.08*l2):0, l3Mon=p.affOn? avg*(0.10*l3):0, l4Mon=p.affOn? avg*(0.02*l4):0;
+  i('affL1Mon').textContent=fmt(p.currency,l1Mon); i('affL2Mon').textContent=fmt(p.currency,l2Mon); i('affL3Mon').textContent=fmt(p.currency,l3Mon); i('affL4Mon').textContent=fmt(p.currency,l4Mon);
   const labelsL=['L1','L2','L3','L4'];
+  const Dm=[l1Mon,l2Mon,l3Mon,l4Mon]; const D1=Dm.map(v=>v*12), D2=Dm.map(v=>v*24), D3=Dm.map(v=>v*36);
   const ac=i('affChart').getContext('2d'); if(affChart) affChart.destroy();
   affChart=new Chart(ac,{type:'bar', data:{labels:labelsL, datasets:[
     {label:'Месяц', data:Dm, color:'#6ec1ff', showValues:true},
-    {label:'1 год', data:Dm.map(v=>v*12), color:'#ff8ea1', showValues:true},
-    {label:'2 года', data:Dm.map(v=>v*24), color:'#8effa4', showValues:true},
-    {label:'3 года', data:Dm.map(v=>v*36), color:'#f8d47b', showValues:true},
+    {label:'1 год', data:D1, color:'#ff8ea1', showValues:true},
+    {label:'2 года', data:D2, color:'#8effa4', showValues:true},
+    {label:'3 года', data:D3, color:'#f8d47b', showValues:true},
   ]}});
-
-  // Итоги
-  const affIncome=p.affOn? p.affMonths*(Dm[0]+Dm[1]+Dm[2]+Dm[3]):0;
-  const ownIncome=(dep>=3000)? Math.max(0, r.interest*0.5):0;
-  const grand=ownIncome+affIncome;
-  i('ownShare').textContent=fmt(p.currency,ownIncome);
-  i('affTotal').textContent=fmt(p.currency,affIncome);
-  i('grandTotal').textContent=fmt(p.currency,grand);
-  i('affPerMonth').textContent='В среднем в месяц: '+fmt(p.currency, grand/Math.max(1,p.affMonths));
-  i('affLevelsHint').textContent='Уровни: 1:'+L[0]+' · 2:'+L[1]+' · 3:'+L[2]+' · 4:'+L[3];
-}
-
-function shareURL(){
-  const p=getParams(); const u=new URL(location.href.split('?')[0]);
-  Object.entries(p).forEach(([k,v])=>u.searchParams.set(k,String(v))); history.replaceState(null,'',u.toString()); return u.toString();
 }
 
 function bind(){
-  const ids=['modeAnnual','modeMonthly','rate','fee','infl','compound','mrate','mvol','initial','contrib','contribFreq','years','timing','currency','affOn','affAvg','affMonths','affL1','affL2','affL3','affL4','affAuto','affP3k','affP10k','affP20k'];
+  const ids=['modeAnnual','modeMonthly','rate','fee','infl','compound','mrate','mvol','initial','contrib','contribFreq','years','timing','currency','affOn','affAvg','affMonths','affL1','affL2','affL3','affL4'];
   ids.forEach(id=>{ const el=i(id); if(!el) return; el.addEventListener('input',render); el.addEventListener('change',render); });
-  i('btnReset').addEventListener('click', ()=>{ location.href = location.pathname; }); // сброс URL-параметров
-  i('btnHelp').addEventListener('click', ()=>alert('Наведи на значки i рядом с полями — там пояснения и формулы.'));
-  i('btnShare').addEventListener('click', ()=>{ const url=shareURL(); navigator.clipboard&&navigator.clipboard.writeText(url); alert('Ссылка скопирована\\n'+url); });
+  i('btnReset').addEventListener('click', ()=>{ location.href = location.pathname; });
+  i('btnShare').addEventListener('click', ()=>{ const u=new URL(location.href.split('?')[0]); Object.entries(getParams()).forEach(([k,v])=>u.searchParams.set(k,String(v))); history.replaceState(null,'',u.toString()); navigator.clipboard&&navigator.clipboard.writeText(u.toString()); alert('Ссылка скопирована'); });
   i('btnPNG').addEventListener('click', ()=>{ const a=document.createElement('a'); a.href=document.querySelector('canvas').toDataURL('image/png'); a.download='zeus_calc.png'; a.click(); });
   i('btnPDF').addEventListener('click', ()=>window.print());
   i('btnCSV').addEventListener('click', ()=>{
-    const p=getParams(); const r=simulate(p);
-    const rows=[['Год','Баланс','Реально (с инфл.)']];
-    r.yearly.forEach(y=>rows.push([y.year,y.balance,y.real]));
-    rows.push([]); rows.push(['L','Месяц','1 год','2 года','3 года']);
-    const dep=p.initial; const lvl1Open=dep>=3000, lvl2Open=dep>=3000, lvl3Open=dep>=10000, lvl4Open=dep>=20000;
-    let avg=Math.max(0,p.affAvg); if(p.affAuto){ const mEff=Math.pow(1+r.ear,1/12)-1; const w3=p.affP3k, w10=p.affP10k, w20=p.affP20k; const sum=Math.max(1,w3+w10+w20); avg=(w3/sum)*(3000*mEff)+(w10/sum)*(10000*mEff)+(w20/sum)*(20000*mEff); }
-    const L=[(lvl1Open?p.affL1:0),(lvl2Open?p.affL2:0),(lvl3Open?p.affL3:0),(lvl4Open?p.affL4:0)]; const R=[0.05,0.08,0.10,0.02];
-    const Dm=L.map((n,i)=> (p.affOn? avg*(R[i]*n):0));
+    const p=getParams(); const r=simulate(p); const rows=[['Год','Баланс','Реально (с инфл.)']]; r.yearly.forEach(y=>rows.push([y.year,y.balance,y.real]));
+    rows.push([]); rows.push(['L','Месяц','1 год','2 года','3 года']); const Dm=[p.affAvg*(0.05*p.affL1),p.affAvg*(0.08*p.affL2),p.affAvg*(0.10*p.affL3),p.affAvg*(0.02*p.affL4)];
     [['L1',0],['L2',1],['L3',2],['L4',3]].forEach(([k,idx])=> rows.push([k, Dm[idx], Dm[idx]*12, Dm[idx]*24, Dm[idx]*36]));
-    const csv=rows.map(r=> r.map(v=> `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\\n');
-    const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download='zeus_calc.csv'; a.click();
+    const csv=rows.map(r=> r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n'); const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download='zeus_calc.csv'; a.click();
   });
 }
 
