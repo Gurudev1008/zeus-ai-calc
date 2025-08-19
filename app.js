@@ -1,0 +1,1 @@
+document.getElementById('app').innerHTML='ZEUS AI Calc v2.0 — заглушка запущена';
