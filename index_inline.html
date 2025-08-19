@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ZEUS AI — Калькулятор v2.0</title>
+  <link rel="icon" href="assets/logo.svg">
+  <style>
+:root{
+  --bg:#0b0f17; --panel:#121826; --text:#e6ecff; --muted:#9aa4bf;
+  --accent:#00E5FF; --accent2:#7A5CFF; --good:#00d084; --warn:#ffcc00; --bad:#ff5a5f;
+  --card:#0f1524; --border:#1e2638; --shadow:0 10px 30px rgba(0,0,0,.35);
+}
+:root.light{
+  --bg:#ffffff; --panel:#f5f7fb; --text:#1a2240; --muted:#4d5a7a;
+  --accent:#005BFF; --accent2:#662EFF; --good:#1a9c68; --warn:#b58900; --bad:#d64550;
+  --card:#ffffff; --border:#e2e8f0; --shadow:0 8px 20px rgba(10,10,10,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+a{color:var(--accent)}
+.container{max-width:1200px;margin:0 auto;padding:24px}
+.header{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.header img{height:36px}
+.header .title{font-size:20px;font-weight:800;letter-spacing:.03em}
+.toolbar{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.btn{padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:linear-gradient(180deg,var(--panel),var(--card));color:var(--text);cursor:pointer;box-shadow:var(--shadow);transition:.2s}
+.btn:hover{transform:translateY(-1px);}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.card{background:linear-gradient(180deg,var(--panel),var(--card));border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 8px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.tile{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.02)}
+.tile label{flex:1}
+.tile input,.tile select{width:160px;max-width:48vw;padding:10px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text)}
+.small{font-size:12px;color:var(--muted)}
+.hl-good{box-shadow:0 0 0 2px var(--good) inset}
+.hl-warn{box-shadow:0 0 0 2px var(--warn) inset}
+.kpi{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+.kpi .meter{flex:1;min-width:200px;border:1px solid var(--border);border-radius:14px;padding:12px}
+.kpi .value{font-size:22px;font-weight:800}
+.progress{height:10px;background:var(--border);border-radius:999px;overflow:hidden;margin-top:8px}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%;transition:width .8s ease}
+.pie,.line{width:100%;height:320px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.footer{margin-top:20px;color:var(--muted);font-size:12px}
+.badge{padding:6px 10px;border:1px solid var(--border);border-radius:10px;white-space:nowrap}
+.tabs{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.tab{padding:8px 12px;border:1px solid var(--border);border-radius:12px;cursor:pointer}
+.tab.active{background:linear-gradient(90deg,var(--accent),var(--accent2));color:black;font-weight:700}
+.switch{display:inline-flex;align-items:center;gap:10px}
+.switch input{appearance:none;width:44px;height:26px;border-radius:999px;background:var(--border);position:relative;outline:none;cursor:pointer;transition:.2s}
+.switch input:checked{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:999px;background:#fff;transition:.2s}
+.switch input:checked::after{left:21px}
+.counter{animation:countup .3s ease}
+@keyframes countup{from{opacity:.2;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* Print (PDF) */
+@media print{
+  .toolbar{display:none !important}
+  body{background:#fff;color:#000}
+  :root{ --bg:#fff; --panel:#fff; --card:#fff; --text:#000; --border:#d1d5db; }
+  .card{page-break-inside:avoid}
+}
+
+/* Responsive */
+@media (max-width:900px){
+  .grid{grid-template-columns:1fr}
+  .input-row{grid-template-columns:1fr}
+  .tile input,.tile select{width:100%}
+}
+</style>
+  <meta name="color-scheme" content="dark light"/>
+</head>
+<body>
+  <div class="container" id="app">
+    <div class="header">
+      <img src="assets/logo.svg" alt="ZEUS AI"/>
+      <div class="title">ZEUS AI — Финансовый калькулятор v2.0</div>
+      <div class="toolbar">
+        <div class="switch"><span class="small" data-i="light">Светлая</span><input type="checkbox" id="theme"><span class="small" data-i="dark">Тёмная</span></div>
+        <button class="btn" id="saveBtn" data-i="save">Сохранить сценарий</button>
+        <button class="btn" id="loadBtn" data-i="load">Загрузить</button>
+        <button class="btn" id="pdfBtn">PDF</button>
+        <button class="btn" id="resetBtn" data-i="reset">Сброс</button>
+        <button class="btn" id="langBtn">RU / EN</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card" style="grid-column: span 12;">
+        <h3 data-i="params">Параметры</h3>
+        <div class="tabs" id="scTabs">
+          <div class="tab active" data-scenario="base" data-i="base">Базовый</div>
+          <div class="tab" data-scenario="opt" data-i="opt">Оптимистичный</div>
+          <div class="tab" data-scenario="pes" data-i="pes">Пессимистичный</div>
+        </div>
+        <div class="input-row">
+          <div class="tile"><label data-i="apr">Годовая ставка, %</label><input type="number" id="apr" value="24" step="0.1"></div>
+          <div class="tile"><label data-i="fee">Комиссия, %</label><input type="number" id="fee" value="10" step="0.1"></div>
+        </div>
+        <div class="input-row">
+          <div class="tile"><label data-i="principal">Первоначальная сумма</label><input type="number" id="principal" value="3000" step="100"></div>
+          <div class="tile"><label data-i="contrib">Регулярное пополнение / мес</label><input type="number" id="contrib" value="200" step="50"></div>
+        </div>
+        <div class="input-row">
+          <div class="tile"><label data-i="years">Срок, лет</label><input type="number" id="years" value="3" step="1"></div>
+          <div class="tile"><label data-i="infl">Инфляция, %</label><input type="number" id="infl" value="6" step="0.1"></div>
+        </div>
+        <div class="input-row">
+          <div class="tile"><label data-i="currency">Валюта</label>
+            <select id="currency"><option>$</option><option>€</option><option>₽</option></select>
+          </div>
+          <div class="tile" id="bigDepositTile"><label data-i="ear">EAR (эффективная)</label><div><span id="earOut">—</span></div></div>
+        </div>
+        <div class="small" data-i="hint">Подсказка: если депозит ≥ $10 000 — плитка подсветится зелёным.</div>
+      </div>
+
+      <div class="card" style="grid-column: span 6;">
+        <h3 data-i="chart1">Рост депозита</h3>
+        <svg class="line" id="lineChart" role="img" aria-label="График роста"></svg>
+      </div>
+
+      <div class="card" style="grid-column: span 6;">
+        <h3 data-i="pie">Структура дохода</h3>
+        <svg class="pie" id="pieChart" role="img" aria-label="Круговая диаграмма"></svg>
+        <div class="kpi">
+          <div class="meter">
+            <div class="small">ROI</div>
+            <div class="value counter" id="roi">—</div>
+            <div class="progress"><div id="roiBar"></div></div>
+          </div>
+          <div class="meter">
+            <div class="small">CAGR</div>
+            <div class="value counter" id="cagr">—</div>
+            <div class="progress"><div id="cagrBar"></div></div>
+          </div>
+          <div class="meter">
+            <div class="small">IRR</div>
+            <div class="value counter" id="irr">—</div>
+            <div class="progress"><div id="irrBar"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="grid-column: span 12;">
+        <h3 data-i="partner">Партнёрская программа</h3>
+        <div class="row">
+          <label class="tile"><span data-i="affUse">Учитывать партнёрку</span><input type="checkbox" id="useAff" checked></label>
+          <label class="tile"><span data-i="affAvg">Средняя прибыль партнёра / мес</span><input type="number" id="affAvg" value="80" step="10"></label>
+          <label class="tile"><span data-i="months">Месяцев учёта</span><input type="number" id="affMonths" value="12" step="1"></label>
+        </div>
+        <div class="input-row">
+          <div class="tile"><label>L1 %</label><input type="number" id="l1" value="10" step="1"></div>
+          <div class="tile"><label>L2 %</label><input type="number" id="l2" value="5" step="1"></div>
+        </div>
+        <div class="input-row">
+          <div class="tile"><label>L3 %</label><input type="number" id="l3" value="3" step="1"></div>
+          <div class="tile"><label>L4 %</label><input type="number" id="l4" value="2" step="1"></div>
+        </div>
+        <div class="row small" id="affBreakdown"></div>
+      </div>
+
+      <div class="card" style="grid-column: span 12;">
+        <h3 data-i="report">Отчёт</h3>
+        <div class="row">
+          <div class="badge" id="invested">Внесено: —</div>
+          <div class="badge" id="earned">Проценты: —</div>
+          <div class="badge" id="partnerIncome">Партнёрка: —</div>
+          <div class="badge" id="totalOut">Итого: —</div>
+          <div class="badge" id="avgMonth">В месяц: —</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">© ZEUS AI. v2.0 — офлайн-графики (SVG), локальное сохранение сценариев, RU/EN, печать PDF через режим «Отчёт».</div>
+  </div>
+
+  <script>
+window.I18N = {
+  ru: {
+    light:"Светлая", dark:"Тёмная", save:"Сохранить сценарий", load:"Загрузить", reset:"Сброс",
+    params:"Параметры", base:"Базовый", opt:"Оптимистичный", pes:"Пессимистичный",
+    apr:"Годовая ставка, %", fee:"Комиссия, %", principal:"Первоначальная сумма", contrib:"Регулярное пополнение / мес",
+    years:"Срок, лет", infl:"Инфляция, %", currency:"Валюта", ear:"EAR (эффективная)",
+    hint:"Подсказка: если депозит ≥ $10 000 — плитка подсветится зелёным.",
+    chart1:"Рост депозита", pie:"Структура дохода",
+    partner:"Партнёрская программа", affUse:"Учитывать партнёрку", affAvg:"Средняя прибыль партнёра / мес", months:"Месяцев учёта",
+    report:"Отчёт"
+  },
+  en: {
+    light:"Light", dark:"Dark", save:"Save scenario", load:"Load", reset:"Reset",
+    params:"Parameters", base:"Baseline", opt:"Optimistic", pes:"Pessimistic",
+    apr:"APR, %", fee:"Fee, %", principal:"Initial amount", contrib:"Monthly contribution",
+    years:"Years", infl:"Inflation, %", currency:"Currency", ear:"EAR (effective)",
+    hint:"Tip: if deposit ≥ $10,000 the tile highlights green.",
+    chart1:"Balance growth", pie:"Income structure",
+    partner:"Affiliate program", affUse:"Include affiliate", affAvg:"Avg partner profit / mo", months:"Months counted",
+    report:"Report"
+  }
+};
+</script>
+  <script>
+window.Utils = {
+  line: (el, points, minY, maxY) => {
+    const W = Math.max(320, el.clientWidth||el.parentElement.clientWidth||800), H = el.clientHeight||320;
+    el.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    el.innerHTML = "";
+    const pad = 24;
+    const xs = points.map((p,i)=>[pad + (points.length>1? i*(W-2*pad)/(points.length-1):0), p]);
+    const min = (minY !== undefined) ? minY : Math.min(...points);
+    const max = (maxY !== undefined) ? maxY : Math.max(...points);
+    const mapY = v => H-pad - ( (v-min)/(max-min||1) )*(H-2*pad);
+    const grid = document.createElementNS("http://www.w3.org/2000/svg","g");
+    for(let i=0;i<=4;i++){
+      const y = pad + i*(H-2*pad)/4;
+      const l = document.createElementNS("http://www.w3.org/2000/svg","line");
+      l.setAttribute("x1", pad); l.setAttribute("x2", W-pad);
+      l.setAttribute("y1", y); l.setAttribute("y2", y);
+      l.setAttribute("stroke", getComputedStyle(document.body).getPropertyValue("--border"));
+      l.setAttribute("stroke-width","1");
+      grid.appendChild(l);
+    }
+    el.appendChild(grid);
+    const path = xs.map((p,i)=>`${i?"L":"M"}${p[0]},${mapY(p[1])}`).join(" ");
+    const pth = document.createElementNS("http://www.w3.org/2000/svg","path");
+    pth.setAttribute("d", path);
+    pth.setAttribute("fill","none");
+    pth.setAttribute("stroke","url(#gradLine)");
+    pth.setAttribute("stroke-width","3");
+    const defs = document.createElementNS("http://www.w3.org/2000/svg","defs");
+    const grad = document.createElementNS("http://www.w3.org/2000/svg","linearGradient");
+    grad.setAttribute("id","gradLine");
+    grad.innerHTML = `<stop offset="0%" stop-color="var(--accent)"/><stop offset="100%" stop-color="var(--accent2)"/>`;
+    defs.appendChild(grad);
+    el.appendChild(defs);
+    el.appendChild(pth);
+  },
+  pie: (el, values) => {
+    const total = values.reduce((a,b)=>a+b,0)||1;
+    const W = Math.max(320, el.clientWidth||el.parentElement.clientWidth||800), H = el.clientHeight||320;
+    const r = Math.min(W,H)/2 - 16;
+    const cx = W/2, cy = H/2;
+    el.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    el.innerHTML = "";
+    let ang = -Math.PI/2;
+    const colors = ["var(--accent)","var(--accent2)","var(--good)","var(--warn)"];
+    values.forEach((v,i)=>{
+      const slice = v/total*Math.PI*2;
+      const x1 = cx + r*Math.cos(ang);
+      const y1 = cy + r*Math.sin(ang);
+      const x2 = cx + r*Math.cos(ang+slice);
+      const y2 = cy + r*Math.sin(ang+slice);
+      const large = slice>Math.PI?1:0;
+      const d = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
+      const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+      path.setAttribute("d", d);
+      path.setAttribute("fill", colors[i%colors.length]);
+      el.appendChild(path);
+      ang += slice;
+    });
+  },
+  irr: (cashflows, guess=0.1) => {
+    let rate = guess;
+    for(let i=0;i<60;i++){
+      let npv=0, d=0;
+      cashflows.forEach((c,t)=>{
+        const df = Math.pow(1+rate, t);
+        npv += c/df;
+        d   -= t*c/(df*(1+rate));
+      });
+      const denom = (d===0)?1e-9:d;
+      const newRate = rate - npv/denom;
+      if(!isFinite(newRate)) break;
+      if(Math.abs(newRate-rate)<1e-7) return rate;
+      rate = newRate;
+    }
+    return rate;
+  },
+  cagr: (start, end, years) => {
+    if(start<=0 || years<=0) return 0;
+    return Math.pow(end/start, 1/years)-1;
+  },
+  roi: (gain, cost) => {
+    if(cost<=0) return 0;
+    return gain/cost;
+  },
+  fmt: (v, cur) => {
+    if (typeof v!=="number" || isNaN(v)) return "—";
+    const s = v>=1e6 ? (v/1e6).toFixed(2)+"M" : v>=1e3 ? (v/1e3).toFixed(2)+"k" : v.toFixed(2);
+    return cur+s;
+  },
+  pct: v => (v*100).toFixed(2)+"%",
+  animateBar: (el, val) => { requestAnimationFrame(()=>{ el.style.width = Math.max(0, Math.min(100, val*100))+"%"; }); },
+  downloadJSON: (name, data) => {
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  },
+  readJSON: () => new Promise(res=>{
+    const inp = document.createElement("input"); inp.type="file"; inp.accept=".json,application/json";
+    inp.onchange = () => { const f = inp.files[0]; const r = new FileReader(); r.onload = ()=>res(JSON.parse(r.result)); r.readAsText(f); };
+    inp.click();
+  })
+};
+</script>
+  <script>
+(() => {
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+  const i18n = window.I18N;
+  let lang = localStorage.getItem("lang") || "ru";
+
+  const ids = ["apr","fee","principal","contrib","years","infl","currency","affAvg","affMonths","l1","l2","l3","l4"];
+  const scenario = { base: {}, opt: {}, pes: {} };
+  let currentScenario = "base";
+
+  function applyLang() {
+    document.documentElement.lang = lang;
+    const dict = i18n[lang];
+    $$("[data-i]").forEach(el => el.textContent = dict[el.getAttribute("data-i")]);
+    $("#langBtn").textContent = lang === "ru" ? "RU / EN" : "EN / RU";
+  }
+  applyLang();
+
+  // Theme
+  const themeToggle = $("#theme");
+  const savedTheme = localStorage.getItem("theme");
+  if(savedTheme === "light") document.documentElement.classList.add("light");
+  themeToggle.checked = !document.documentElement.classList.contains("light");
+  themeToggle.onchange = () => {
+    document.documentElement.classList.toggle("light", !themeToggle.checked);
+    localStorage.setItem("theme", document.documentElement.classList.contains("light")?"light":"dark");
+  };
+
+  // Scenario tabs
+  $$("#scTabs .tab").forEach(tab=>{
+    tab.onclick = () => {
+      $$("#scTabs .tab").forEach(t=>t.classList.remove("active"));
+      tab.classList.add("active");
+      currentScenario = tab.dataset.scenario;
+      recalc();
+    };
+  });
+
+  // Inputs
+  const idsAll = [...ids];
+  idsAll.forEach(id => {
+    const el = $("#"+id);
+    el.addEventListener("input", recalc);
+  });
+  $("#useAff").addEventListener("change", recalc);
+
+  function effRate(apr, fee){
+    const net = Math.max(0, apr/100*(1-fee/100));
+    const m = net/12;
+    return ((1+m)**12 - 1)*100;
+  }
+
+  function recalc(){
+    const aprBase = +($("#apr").value||0);
+    const inflBase = +($("#infl").value||0);
+    const fee = +($("#fee").value||0);
+    const contrib = +($("#contrib").value||0);
+    const years = +($("#years").value||0);
+    const principal = +($("#principal").value||0);
+    const currency = $("#currency").value;
+
+    // scenario deltas
+    let apr = aprBase, infl = inflBase;
+    if(currentScenario==="opt"){ apr = aprBase+6; infl = Math.max(0, inflBase-2); }
+    if(currentScenario==="pes"){ apr = Math.max(0, aprBase-6); infl = inflBase+3; }
+
+    // EAR
+    const ear = effRate(apr, fee);
+    $("#earOut").textContent = ear.toFixed(2)+"%";
+
+    // highlight deposit
+    $("#bigDepositTile").classList.toggle("hl-good", principal>=10000);
+
+    // simulate monthly
+    const months = Math.max(1, Math.round(years*12));
+    const netMonthly = ((apr/100)*(1-fee/100))/12;
+    let bal = principal;
+    let invested = principal;
+    const series = [bal];
+    const cashflows = [-principal];
+    for(let t=1;t<=months;t++){
+      bal = bal*(1+netMonthly) + contrib;
+      series.push(bal);
+      invested += contrib;
+      cashflows.push(-contrib);
+    }
+    const end = series[series.length-1];
+    const interest = Math.max(0, end - invested);
+
+    // partner
+    let partner = 0;
+    if($("#useAff").checked){
+      const avg = +($("#affAvg").value||0);
+      const m = +($("#affMonths").value||0);
+      const pcts = [+$("#l1").value,+$("#l2").value,+$("#l3").value,+$("#l4").value].map(v=>Math.max(0, +v)/100);
+      const sumPct = pcts.reduce((a,b)=>a+b,0);
+      for(let t=1;t<=m;t++){ const inc = avg*sumPct; partner += inc; cashflows.push(inc); }
+    }
+
+    // KPI
+    const roi = Utils.roi(interest+partner, invested);
+    const cagr = Utils.cagr(invested, end+partner, months/12);
+    const irr = (function(){ try { return Utils.irr(cashflows); } catch(e){ return 0; } })();
+
+    $("#roi").textContent = Utils.pct(roi);
+    $("#cagr").textContent = Utils.pct(cagr);
+    $("#irr").textContent = Utils.pct(irr);
+
+    Utils.animateBar($("#roiBar"), Math.min(roi,2));
+    Utils.animateBar($("#cagrBar"), Math.min(Math.abs(cagr),1));
+    Utils.animateBar($("#irrBar"), Math.min(Math.abs(irr),1));
+
+    // charts
+    Utils.line($("#lineChart"), series, Math.min(...series)*0.98, Math.max(...series)*1.02);
+    Utils.pie($("#pieChart"), [interest, Math.max(0, partner), invested]);
+
+    // report badges
+    $("#invested").textContent = (lang==="ru"?"Внесено: ":"Invested: ")+Utils.fmt(invested, currency);
+    $("#earned").textContent = (lang==="ru"?"Проценты: ":"Interest: ")+Utils.fmt(interest, currency);
+    $("#partnerIncome").textContent = (lang==="ru"?"Партнёрка: ":"Affiliate: ")+Utils.fmt(partner, currency);
+    $("#totalOut").textContent = (lang==="ru"?"Итого: ":"Total: ")+Utils.fmt(end+partner, currency);
+    $("#avgMonth").textContent = (lang==="ru"?"В месяц: ":"Per month: ")+Utils.fmt((end+partner - invested)/months, currency);
+
+    // per-level breakdown
+    const pcts = [+$("#l1").value,+$("#l2").value,+$("#l3").value,+$("#l4").value];
+    const avg = +($("#affAvg").value||0);
+    const m = +($("#affMonths").value||0);
+    $("#affBreakdown").innerHTML = pcts.map((p,i)=>{
+      const perMonth = avg*(p/100);
+      return `<div class="badge">L${i+1}: ${Utils.fmt(perMonth, currency)} / мес · ${Utils.fmt(perMonth*m, currency)} / период</div>`;
+    }).join("");
+  }
+
+  // Save/Load
+  $("#saveBtn").onclick = () => {
+    const data = { ts: Date.now(), lang, theme: document.documentElement.classList.contains("light")?"light":"dark",
+      scenario: currentScenario
+    };
+    ["apr","fee","principal","contrib","years","infl","currency","affAvg","affMonths","l1","l2","l3","l4"].forEach(id=> data[id] = $("#"+id).value);
+    Utils.downloadJSON("zeus-calc-scenario.json", data);
+  };
+  $("#loadBtn").onclick = async () => {
+    const data = await Utils.readJSON();
+    if(!data) return;
+    lang = data.lang || lang;
+    localStorage.setItem("theme", data.theme||"dark");
+    document.documentElement.classList.toggle("light", (data.theme||"dark")==="light");
+    currentScenario = data.scenario || "base";
+    ["apr","fee","principal","contrib","years","infl","currency","affAvg","affMonths","l1","l2","l3","l4"].forEach(id=> { if(data[id]!==undefined){ $("#"+id).value = data[id]; } });
+    $$("#scTabs .tab").forEach(t=> t.classList.toggle("active", t.dataset.scenario===currentScenario));
+    applyLang();
+    recalc();
+  };
+
+  // Reset
+  $("#resetBtn").onclick = () => { location.reload(); };
+
+  // Language
+  $("#langBtn").onclick = () => {
+    lang = (lang==="ru") ? "en" : "ru";
+    localStorage.setItem("lang", lang);
+    applyLang(); recalc();
+  };
+
+  // PDF
+  $("#pdfBtn").onclick = () => { window.print(); };
+
+  // Initial
+  window.addEventListener("load", recalc);
+  window.addEventListener("resize", recalc);
+})();
+</script>
+</body>
+</html>
