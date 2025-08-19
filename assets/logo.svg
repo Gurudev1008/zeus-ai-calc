@@ -1,1 +1,5 @@
-<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='8' fill='#0b1330'/><path d='M36 4 10 36h12l-4 24 26-32H28z' fill='#38e8ff' stroke='#38e8ff' stroke-width='2'/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 40">
+  <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#7DF3FF"/><stop offset="1" stop-color="#8E7DFF"/></linearGradient></defs>
+  <rect width="160" height="40" rx="10" fill="#0B0F17"/>
+  <text x="20" y="26" font-family="Arial Black, Arial" font-size="20" fill="url(#g)">ZEUS AI</text>
+</svg>
