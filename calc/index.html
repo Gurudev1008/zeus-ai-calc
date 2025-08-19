@@ -3,117 +3,346 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>ZEUS AI — Калькулятор v2.0</title>
-  <link rel="icon" href="assets/logo.svg">
+  <title>ZEUS AI — Калькулятор v2.1f</title>
+  <link rel="icon" href="assets/logo.svg"/>
   <link rel="stylesheet" href="styles.css"/>
   <meta name="color-scheme" content="dark light"/>
 </head>
 <body>
-  <div class="container" id="app">
-    <div class="header">
-      <img src="assets/logo.svg" alt="ZEUS AI"/>
-      <div class="title">ZEUS AI — Финансовый калькулятор v2.0</div>
-      <div class="toolbar">
-        <div class="switch"><span class="small" data-i="light">Светлая</span><input type="checkbox" id="theme"><span class="small" data-i="dark">Тёмная</span></div>
-        <button class="btn" id="saveBtn" data-i="save">Сохранить сценарий</button>
-        <button class="btn" id="loadBtn" data-i="load">Загрузить</button>
-        <button class="btn" id="pdfBtn">PDF</button>
-        <button class="btn" id="resetBtn" data-i="reset">Сброс</button>
-        <button class="btn" id="langBtn">RU / EN</button>
-      </div>
+<div class="container">
+  <div class="header">
+    <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 40" aria-hidden="true">
+      <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#00E5FF"/><stop offset="1" stop-color="#7A5CFF"/></linearGradient></defs>
+      <rect width="160" height="40" rx="10" fill="#0B0F17"/>
+      <text x="16" y="26" font-family="Inter, Arial Black, Arial" font-size="18" fill="url(#g)">ZEUS AI</text>
+    </svg>
+    <div class="title">ZEUS AI — Калькулятор инвестиций v2.1f</div>
+    <div class="toolbar">
+      <div class="switch"><span class="tiny">Light</span><input type="checkbox" id="theme"><span class="tiny">Dark</span></div>
+      <button class="btn" id="saveBtn">Сохранить</button>
+      <button class="btn" id="loadBtn">Загрузить</button>
+      <button class="btn" id="pdfBtn">PDF</button>
     </div>
-
-    <div class="grid">
-      <div class="card" style="grid-column: span 12;">
-        <h3 data-i="params">Параметры</h3>
-        <div class="tabs" id="scTabs">
-          <div class="tab active" data-scenario="base" data-i="base">Базовый</div>
-          <div class="tab" data-scenario="opt" data-i="opt">Оптимистичный</div>
-          <div class="tab" data-scenario="pes" data-i="pes">Пессимистичный</div>
-        </div>
-        <div class="input-row">
-          <div class="tile"><label data-i="apr">Годовая ставка, %</label><input type="number" id="apr" value="24" step="0.1"></div>
-          <div class="tile"><label data-i="fee">Комиссия, %</label><input type="number" id="fee" value="10" step="0.1"></div>
-        </div>
-        <div class="input-row">
-          <div class="tile"><label data-i="principal">Первоначальная сумма</label><input type="number" id="principal" value="3000" step="100"></div>
-          <div class="tile"><label data-i="contrib">Регулярное пополнение / мес</label><input type="number" id="contrib" value="200" step="50"></div>
-        </div>
-        <div class="input-row">
-          <div class="tile"><label data-i="years">Срок, лет</label><input type="number" id="years" value="3" step="1"></div>
-          <div class="tile"><label data-i="infl">Инфляция, %</label><input type="number" id="infl" value="6" step="0.1"></div>
-        </div>
-        <div class="input-row">
-          <div class="tile"><label data-i="currency">Валюта</label>
-            <select id="currency"><option>$</option><option>€</option><option>₽</option></select>
-          </div>
-          <div class="tile" id="bigDepositTile"><label data-i="ear">EAR (эффективная)</label><div><span id="earOut">—</span></div></div>
-        </div>
-        <div class="small" data-i="hint">Подсказка: если депозит ≥ $10 000 — плитка подсветится зелёным.</div>
-      </div>
-
-      <div class="card" style="grid-column: span 6;">
-        <h3 data-i="chart1">Рост депозита</h3>
-        <svg class="line" id="lineChart" role="img" aria-label="График роста"></svg>
-      </div>
-
-      <div class="card" style="grid-column: span 6;">
-        <h3 data-i="pie">Структура дохода</h3>
-        <svg class="pie" id="pieChart" role="img" aria-label="Круговая диаграмма"></svg>
-        <div class="kpi">
-          <div class="meter">
-            <div class="small">ROI</div>
-            <div class="value counter" id="roi">—</div>
-            <div class="progress"><div id="roiBar"></div></div>
-          </div>
-          <div class="meter">
-            <div class="small">CAGR</div>
-            <div class="value counter" id="cagr">—</div>
-            <div class="progress"><div id="cagrBar"></div></div>
-          </div>
-          <div class="meter">
-            <div class="small">IRR</div>
-            <div class="value counter" id="irr">—</div>
-            <div class="progress"><div id="irrBar"></div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" style="grid-column: span 12;">
-        <h3 data-i="partner">Партнёрская программа</h3>
-        <div class="row">
-          <label class="tile"><span data-i="affUse">Учитывать партнёрку</span><input type="checkbox" id="useAff" checked></label>
-          <label class="tile"><span data-i="affAvg">Средняя прибыль партнёра / мес</span><input type="number" id="affAvg" value="80" step="10"></label>
-          <label class="tile"><span data-i="months">Месяцев учёта</span><input type="number" id="affMonths" value="12" step="1"></label>
-        </div>
-        <div class="input-row">
-          <div class="tile"><label>L1 %</label><input type="number" id="l1" value="10" step="1"></div>
-          <div class="tile"><label>L2 %</label><input type="number" id="l2" value="5" step="1"></div>
-        </div>
-        <div class="input-row">
-          <div class="tile"><label>L3 %</label><input type="number" id="l3" value="3" step="1"></div>
-          <div class="tile"><label>L4 %</label><input type="number" id="l4" value="2" step="1"></div>
-        </div>
-        <div class="row small" id="affBreakdown"></div>
-      </div>
-
-      <div class="card" style="grid-column: span 12;">
-        <h3 data-i="report">Отчёт</h3>
-        <div class="row">
-          <div class="badge" id="invested">Внесено: —</div>
-          <div class="badge" id="earned">Проценты: —</div>
-          <div class="badge" id="partnerIncome">Партнёрка: —</div>
-          <div class="badge" id="totalOut">Итого: —</div>
-          <div class="badge" id="avgMonth">В месяц: —</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="footer">© ZEUS AI. v2.0 — офлайн-графики (SVG), локальное сохранение сценариев, RU/EN, печать PDF через режим «Отчёт».</div>
   </div>
 
-  <script src="strings.js"></script>
-  <script src="utils.js"></script>
-  <script src="app.js"></script>
+  <div class="grid">
+    <div class="card" style="grid-column: span 12;">
+      <h3>Параметры</h3>
+      <div class="section-sub">Каждое поле снабжено подсказкой ⓘ</div>
+      <div class="row">
+        <div class="tile"><label>Валюта <span class="help" title="Только символ отображения. На расчёты не влияет.">ⓘ</span></label>
+          <select id="currency"><option>USDT</option><option>$</option><option>€</option><option>₽</option></select>
+        </div>
+        <div class="tile" id="depositTile"><label>Сумма депозита <span class="help" title="Начальный вклад. Влияет на долю собственного дохода и количество уровней партнёрки. ≥$3k → 50%/2 ур.; ≥$10k → 60%/3 ур.; ≥$20k → 70%/4 ур.">ⓘ</span></label>
+          <input type="number" id="principal" value="3000" step="100">
+        </div>
+        <div class="tile"><label>Сколько % в месяц будет доход <span class="help" title="Ежемесячная доходность (брутто).">ⓘ</span></label>
+          <input type="number" id="monRate" value="5" step="0.1">
+        </div>
+        <div class="tile"><label>Годовая прибыль, % <span class="help" title="Автоматически от месячной: (1+m)^12−1.">ⓘ</span></label>
+          <input type="number" id="annRate" value="79.59" step="0.01" readonly>
+        </div>
+        <div class="tile"><label>Колебания в месяц, ± % <span class="help" title="Отклонения доходности (информативно).">ⓘ</span></label>
+          <input type="number" id="vol" value="2" step="0.1">
+        </div>
+        <div class="tile"><label>Комиссия, % в месяц <span class="help" title="Сколько уходит в месяц на партнёрку и комиссию проекта.">ⓘ</span></label>
+          <input type="number" id="feeMon" value="1" step="0.1">
+        </div>
+        <div class="tile"><label>Регулярное пополнение / мес <span class="help" title="Ежемесячная сумма дополнительного инвестирования.">ⓘ</span></label>
+          <input type="number" id="contrib" value="200" step="50">
+        </div>
+        <div class="tile"><label>Капитализация <span class="help" title="1 — ежегодная, 4 — квартальная, 12 — ежемесячная.">ⓘ</span></label>
+          <select id="caps"><option value="1">1</option><option value="4">4</option><option value="12" selected>12</option></select>
+        </div>
+        <div class="tile"><label>Тайминг пополнения <span class="help" title="Когда прибавлять пополнение: в начале или конце шага.">ⓘ</span></label>
+          <select id="contribTiming"><option value="end">В конце периода</option><option value="begin">В начале периода</option></select>
+        </div>
+        <div class="tile"><label>Срок, лет <span class="help" title="Горизонт моделирования (1–30).">ⓘ</span></label>
+          <input type="number" id="years" value="3" step="1" min="1" max="30">
+        </div>
+        <div class="tile"><label>Инфляция, % <span class="help" title="Учитывается в колонке «Реально (с инфл.)».">ⓘ</span></label>
+          <input type="number" id="infl" value="6" step="0.1">
+        </div>
+        <div class="tile"><label>EAR (эффективная) <span class="help" title="(1 + r_net/n)^n − 1, где r_net — годовая нетто-ставка, n — капитализаций/год.">ⓘ</span></label>
+          <div class="tiny"><b id="ear">—</b></div>
+        </div>
+      </div>
+      <div class="tiny">Шаг: LCM(капитализация, 12). Пополнения — на месячных границах (begin/end).</div>
+    </div>
+
+    <div class="card" style="grid-column: span 6;">
+      <h3>Рост капитала</h3>
+      <svg class="line" id="lineChart"></svg>
+    </div>
+    <div class="card" style="grid-column: span 6;">
+      <h3>Структура: Внесено / Проценты / Собственный</h3>
+      <svg class="pie" id="pieChart"></svg>
+      <div class="kpi">
+        <div class="meter"><div class="tiny">Внесено, всего</div><div class="value" id="kpiInvested">—</div></div>
+        <div class="meter"><div class="tiny">Начислено процентов</div><div class="value" id="kpiInterest">—</div></div>
+        <div class="meter"><div class="tiny">EAR (эффективная)</div><div class="value" id="kpiEAR">—</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="grid-column: span 12;">
+      <h3>Таблица по годам</h3>
+      <table class="table" id="yearTable">
+        <thead><tr><th>Год</th><th>Баланс</th><th>Реально (с инфл.)</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="card" style="grid-column: span 12;">
+      <h3>Партнёрская программа</h3>
+      <div class="section-sub">Ставки уровней: [L1=5%, L2=8%, L3=10%, L4=2%]. Активные уровни зависят от суммы депозита.</div>
+      <div class="row">
+        <label class="tile"><span>Учитывать партнёрку</span><input type="checkbox" id="useAff" checked></label>
+        <label class="tile"><span>Средняя прибыль партнёра / мес</span><input type="number" id="affAvg" value="80" step="10"></label>
+        <label class="tile"><span>Месяцев учёта</span><input type="number" id="affMonths" value="12" step="1" min="1"></label>
+      </div>
+      <div class="row">
+        <div class="tile"><label>Количество L1</label><input type="number" id="cL1" value="10" step="1" min="0"></div>
+        <div class="tile"><label>Количество L2</label><input type="number" id="cL2" value="6" step="1" min="0"></div>
+        <div class="tile"><label>Количество L3</label><input type="number" id="cL3" value="3" step="1" min="0"></div>
+        <div class="tile"><label>Количество L4</label><input type="number" id="cL4" value="1" step="1" min="0"></div>
+      </div>
+      <div class="badges" id="affSummary"></div>
+    </div>
+
+    <div class="card" style="grid-column: span 12;">
+      <h3>Диаграмма партнёрской прибыли</h3>
+      <div class="tabs" id="affTabs">
+        <div class="tab active" data-view="all">Все уровни</div>
+        <div class="tab" data-view="L1">L1</div>
+        <div class="tab" data-view="L2">L2</div>
+        <div class="tab" data-view="L3">L3</div>
+        <div class="tab" data-view="L4">L4</div>
+        <div class="tab" data-view="own">Собственный</div>
+      </div>
+      <svg class="bars" id="barsChart"></svg>
+      <div class="tiny">Группы — уровни (L1–L4) или «Собственный». Серии — горизонты: Месяц / 1 год / 2 года / 3 года.</div>
+    </div>
+
+    <div class="card" style="grid-column: span 12;">
+      <h3>Аналитика</h3>
+      <div id="analysisText" class="section-sub">—</div>
+    </div>
+  </div>
+
+  <div class="footer">© ZEUS AI. v2.1f — офлайн SVG‑графики, LCM‑шаг, партнёрская диаграмма и авто‑аналитика.</div>
+</div>
+
+<script src="utils.js"></script>
+<script>
+const $=sel=>document.querySelector(sel); const $$=sel=>Array.from(document.querySelectorAll(sel));
+const theme=$('#theme'); const saved=localStorage.getItem('theme'); if(saved==='light') document.documentElement.classList.add('light');
+theme.checked = !document.documentElement.classList.contains('light');
+theme.onchange=()=>{document.documentElement.classList.toggle('light', !theme.checked); localStorage.setItem('theme', document.documentElement.classList.contains('light')?'light':'dark')};
+
+const ids=['currency','principal','monRate','annRate','vol','feeMon','contrib','caps','contribTiming','years','infl','useAff','affAvg','affMonths','cL1','cL2','cL3','cL4'];
+ids.forEach(id=>{ const el=$('#'+id); el.addEventListener('input', recalc); el.addEventListener('change', recalc); });
+
+$('#saveBtn').onclick = ()=>{
+  const data={}; ids.forEach(id=> data[id] = ($('#'+id).type==='checkbox')?$('#'+id).checked:$('#'+id).value);
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='zeus_calc_scenario.json'; a.click();
+};
+$('#loadBtn').onclick = ()=>{
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='.json,application/json';
+  inp.onchange = ()=>{ const f=inp.files[0]; const r=new FileReader(); r.onload=()=>{ const data=JSON.parse(r.result); for(const k in data){ if($('#'+k)){ if($('#'+k).type==='checkbox') $('#'+k).checked=!!data[k]; else $('#'+k).value=data[k]; } } recalc(); }; r.readAsText(f); };
+  inp.click();
+};
+$('#pdfBtn').onclick = ()=>window.print();
+
+function simulateToMonth(targetMonths){
+  const principal = +$('#principal').value;
+  const mGross = +$('#monRate').value/100;
+  const feeMon = +$('#feeMon').value/100;
+  const mNet = Math.max(0, mGross - feeMon);
+  const caps = +$('#caps').value;
+  const timing = $('#contribTiming').value;
+  const years = Math.max(1, Math.min(30, +$('#years').value));
+  const contrib = +$('#contrib').value;
+
+  const annNet = Math.pow(1+mNet,12)-1; 
+  const stepsPerYear = Utils.lcm(caps,12);
+  const stepRate = Math.pow(1+annNet, 1/stepsPerYear) - 1;
+  const contribEverySteps = Math.floor(stepsPerYear/12);
+
+  let bal = principal;
+  let invested = principal;
+  let step = 0;
+  const totalSteps = Math.min(targetMonths*contribEverySteps, years*stepsPerYear);
+  while(step<totalSteps){
+    const isMonthBoundary = (step % contribEverySteps)===0;
+    if(isMonthBoundary && timing==='begin'){ bal += contrib; invested += contrib; }
+    bal *= (1 + stepRate);
+    if(isMonthBoundary && timing==='end'){ bal += contrib; invested += contrib; }
+    step++;
+  }
+  return {bal, invested};
+}
+
+function buildYearSeries(){
+  const years = Math.max(1, Math.min(30, +$('#years').value));
+  const contrib = +$('#contrib').value;
+  const mGross = +$('#monRate').value/100;
+  const feeMon = +$('#feeMon').value/100;
+  const mNet = Math.max(0, mGross - feeMon);
+  const caps = +$('#caps').value;
+  const timing = $('#contribTiming').value;
+  const principal = +$('#principal').value;
+
+  const annNet = Math.pow(1+mNet,12)-1;
+  const stepsPerYear = Utils.lcm(caps,12);
+  const stepRate = Math.pow(1+annNet, 1/stepsPerYear) - 1;
+  const contribEverySteps = Math.floor(stepsPerYear/12);
+
+  let bal = principal;
+  let invested = principal;
+  const series = [bal];
+  const byYear = [{year:0, bal, invested}];
+  let step = 0;
+  const totalSteps = years*stepsPerYear;
+
+  while(step<totalSteps){
+    const isMonthBoundary = (step % contribEverySteps)===0;
+    if(isMonthBoundary && timing==='begin'){ bal += contrib; invested += contrib; }
+    bal *= (1 + stepRate);
+    if(isMonthBoundary && timing==='end'){ bal += contrib; invested += contrib; }
+    step++;
+    if(step % stepsPerYear === 0){
+      const y = step/stepsPerYear;
+      series.push(bal);
+      byYear.push({year:y, bal, invested});
+    }
+  }
+  return {series, byYear};
+}
+
+function updateAffSection(ownShare){
+  const useAff = $('#useAff').checked;
+  const affAvg = +$('#affAvg').value;
+  const affMonths = Math.max(1, +$('#affMonths').value);
+  const c=[+$('#cL1').value, +$('#cL2').value, +$('#cL3').value, +$('#cL4').value];
+  const rates=[0.05,0.08,0.10,0.02];
+  const principal = +$('#principal').value;
+
+  let levelsAllowed = 1;
+  if(principal>=20000) levelsAllowed=4;
+  else if(principal>=10000) levelsAllowed=3;
+  else if(principal>=3000) levelsAllowed=2;
+  else levelsAllowed=1;
+  ['cL1','cL2','cL3','cL4'].forEach((id,idx)=>{ const el=$('#'+id); el.disabled = (idx+1)>levelsAllowed; });
+
+  let levelMon = c.map((cnt,i)=> affAvg * (rates[i] * ((i+1)<=levelsAllowed ? cnt : 0)) );
+  if(!useAff){ levelMon = levelMon.map(()=>0); }
+
+  const totalMon = levelMon.reduce((a,b)=>a+b,0);
+
+  const badges = [];
+  badges.push(`<div class="badge">Уровни активны: L1..L${levelsAllowed}</div>`);
+  badges.push(`<div class="badge">Собственный %: ${(ownShare*100).toFixed(0)}%</div>`);
+  badges.push(`<div class="badge">Партнёрка / мес: ${Utils.fmtMoney(totalMon,'$')}</div>`);
+  badges.push(`<div class="badge">За период (${affMonths} мес): ${Utils.fmtMoney(totalMon*affMonths,'$')}</div>`);
+  $('#affSummary').innerHTML = badges.join(' ');
+
+  const view = $('#affTabs .tab.active').dataset.view;
+  const groupsAll = ['L1','L2','L3','L4'].slice(0,levelsAllowed);
+  const series = ['Месяц','1 год','2 года','3 года'];
+  let values;
+
+  if(view==='all'){
+    const perSeries = series.map((s,si)=>{
+      const mult = [1,12,24,36][si];
+      return levelMon.slice(0,levelsAllowed).map(v=> v*mult);
+    });
+    values = perSeries;
+    Utils.bars($('#barsChart'), groupsAll, series, values);
+  } else if(view==='own'){
+    const y1 = simulateToMonth(12);
+    const y2 = simulateToMonth(24);
+    const y3 = simulateToMonth(36);
+    const m1 = simulateToMonth(1);
+    const ownMonth = Math.max(0, (m1.bal - m1.invested)) * ownShare;
+    const own1 = Math.max(0, (y1.bal - y1.invested)) * ownShare;
+    const own2 = Math.max(0, (y2.bal - y2.invested)) * ownShare;
+    const own3 = Math.max(0, (y3.bal - y3.invested)) * ownShare;
+    Utils.bars($('#barsChart'), ['Собственный'], series, [[ownMonth],[own1],[own2],[own3]]);
+  } else {
+    const idx = {L1:0,L2:1,L3:2,L4:3}[view];
+    Utils.bars($('#barsChart'), [view], series, [[levelMon[idx]],[levelMon[idx]*12],[levelMon[idx]*24],[levelMon[idx]*36]]);
+  }
+
+  return {levelMon, totalMon};
+}
+
+function recalc(){
+  const currency = $('#currency').value==='USDT'?'$':$('#currency').value;
+  const principal = +$('#principal').value;
+  const mGross = +$('#monRate').value/100;
+  const feeMon = +$('#feeMon').value/100;
+  const mNet = Math.max(0, mGross - feeMon);
+  const caps = +$('#caps').value;
+  const years = Math.max(1, Math.min(30, +$('#years').value));
+  const infl = +$('#infl').value/100;
+
+  let ownShare = 0; let levelsAllowed=1;
+  if(principal>=20000){ ownShare=0.70; levelsAllowed=4; }
+  else if(principal>=10000){ ownShare=0.60; levelsAllowed=3; }
+  else if(principal>=3000){ ownShare=0.50; levelsAllowed=2; }
+  else { ownShare=0.0; levelsAllowed=1; }
+  $('#depositTile').classList.toggle('hl-good', principal>=3000);
+
+  const annGross = (Math.pow(1+mGross,12)-1)*100;
+  $('#annRate').value = annGross.toFixed(2);
+
+  const annNet = (Math.pow(1+mNet,12)-1); 
+  const ear = annNet*100;
+  $('#ear').textContent = ear.toFixed(2)+'%';
+  $('#kpiEAR').textContent = ear.toFixed(2)+'%';
+
+  const {series, byYear} = buildYearSeries();
+  Utils.line($('#lineChart'), series, Math.min(...series)*0.98, Math.max(...series)*1.02);
+
+  const last = byYear[byYear.length-1];
+  const investedTotal = last.invested;
+  const interestTotal = Math.max(0, last.bal - last.invested);
+  $('#kpiInvested').textContent = Utils.fmtMoney(investedTotal, currency);
+  $('#kpiInterest').textContent = Utils.fmtMoney(interestTotal, currency);
+
+  const ownInterest = interestTotal * ownShare;
+  const otherInterest = interestTotal - ownInterest;
+  Utils.pie($('#pieChart'), [investedTotal, otherInterest, ownInterest]);
+
+  const tb = $('#yearTable tbody'); tb.innerHTML="";
+  byYear.slice(1).forEach(row=>{
+    const real = row.bal / Math.pow(1+infl, row.year);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${row.year}</td><td style="text-align:right">${Utils.fmtMoney(row.bal, currency)}</td><td style="text-align:right">${Utils.fmtMoney(real, currency)}</td>`;
+    tb.appendChild(tr);
+  });
+
+  const aff = updateAffSection(ownShare);
+
+  const y1 = byYear.find(r=>r.year===1) || byYear[byYear.length-1];
+  const y1_interest = Math.max(0, y1.bal - y1.invested);
+  const partner1 = aff.totalMon * 12;
+  const line1 = `📈 Через год у вас будет ${Utils.fmtMoney(y1.bal, currency)} (реально ≈ ${Utils.fmtMoney(y1.bal/Math.pow(1+infl,1), currency)}).`;
+  const line2 = `💰 Общая прибыль по вкладу за год: ${Utils.fmtMoney(y1_interest, currency)} (из них собственный доход ${Math.round(ownShare*100)}% = ${Utils.fmtMoney(y1_interest*ownShare, currency)}).`;
+  const line3 = `🤝 Партнёрская программа может принести ≈ ${Utils.fmtMoney(partner1, currency)} за год при текущих параметрах.`;
+  $('#analysisText').textContent = `${line1} ${line2} ${line3}`;
+}
+
+$('#affTabs').addEventListener('click', e=>{
+  if(e.target.classList.contains('tab')){
+    $$('#affTabs .tab').forEach(t=>t.classList.remove('active'));
+    e.target.classList.add('active'); recalc();
+  }
+});
+
+window.addEventListener('load', ()=>{ recalc(); });
+window.addEventListener('resize', ()=>{ recalc(); });
+</script>
 </body>
 </html>
